@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const mongoPath = process.env.MONGO_LOGIN
+const mongoPath = "mongodb+srv://Bot_Agent:Minecraft18@bot-settings.miusd.mongodb.net/Bot-Settings?retryWrites=true&w=majority"
 
 module.exports = async () => {
     await mongoose.connect(mongoPath, {

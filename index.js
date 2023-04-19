@@ -38,7 +38,7 @@ leaveOnStop: true,
 leaveOnEnd: false,
 deafenOnJoin: true,
 volume: 100,
-quality: 'low',
+quality: 'high',
 });
 client.player = player;
 
