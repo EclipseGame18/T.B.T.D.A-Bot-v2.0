@@ -213,6 +213,14 @@ client.on('messageCreate', async (message) => {
 		}
 	}
 
+    if (message.mentions.has(client.user)) {
+        const ping = new EmbedBuilder()
+        .setTitle(`Hello ${message.author.username}`)
+        .setDescription(`I am ${client.user.username}, my defult prefix is either **/** or **!**. If you need help please join our [support server.](https://discord.gg/3mkKSGw)`)
+        .setColor('#00B9FF')
+        message.channel.send({embeds: [ping]})
+      }
+
     if(!message.content.startsWith(prefix)) return;
     let guildQueue = client.player.getQueue(message.guild.id);
 
