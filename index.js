@@ -93,7 +93,7 @@ await initMessage.channel.send({embeds: [playEmbed]})
         let initMessage = queue.data.queueInitMessage;
         const empty = new EmbedBuilder()
         .setTitle('Channel empty')
-        .setDescription('The voice channel is empty, I have left the channel to save recources')
+        .setDescription('The voice channel is empty, I have left the channel to save recources.')
         .setColor('#6CFFD9')
         await initMessage.channel.send({embeds: [empty]})
         
