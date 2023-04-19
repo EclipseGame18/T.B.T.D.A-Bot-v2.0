@@ -1,0 +1,24 @@
+{
+  "name": "t.b.t.d.a_bot",
+  "version": "2.0.1",
+  "description": "This is the re-write of T.B.T.D.A The Discord Bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "node .",
+    "start": "node ."
+  },
+  "author": "Fergus, Eclipse Code18",
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/opus": "^0.9.0",
+    "@discordjs/voice": "^0.16.0",
+    "discord-music-player": "^9.1.1",
+    "discord.js": "^14.9.0",
+    "ffmpeg-static": "^5.1.0",
+    "isomorphic-unfetch": "^4.0.2",
+    "node-gyp": "^9.3.1",
+    "wokcommands": "^2.1.0",
+    "ytdl-core": "^4.11.3",
+    "ytsr": "^3.5.0"
+  }
+}
