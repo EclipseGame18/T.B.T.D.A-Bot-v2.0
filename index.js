@@ -23,7 +23,8 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds,
                                       GatewayIntentBits.GuildMessages,
                                       GatewayIntentBits.DirectMessages,
                                       GatewayIntentBits.GuildMembers,
-                                      GatewayIntentBits.GuildVoiceStates
+                                      GatewayIntentBits.GuildVoiceStates,
+                                      GatewayIntentBits.GuildModeration
                                      ],
                                      partials: [Partials.Channel],
                         });
@@ -32,7 +33,7 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds,
 const { RepeatMode } = require('discord-music-player');
 const { Player } = require("discord-music-player");
 const player = new Player(client, {
-leaveOnEmpty: false,
+leaveOnEmpty: true,
 leaveOnStop: true,
 leaveOnEnd: false,
 deafenOnJoin: true,
