@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const mongoPath = "mongodb+srv://Bot_Agent:Minecraft18@bot-settings.miusd.mongodb.net/Bot-Settings?retryWrites=true&w=majority"
+const mongoPath = process.env.MONGO_PATH
 
 module.exports = async () => {
     await mongoose.connect(mongoPath, {
@@ -9,7 +9,7 @@ module.exports = async () => {
     }).then(()=>{
         console.log('Connected to MongoDB!')
     }).catch((err) =>{
-        console.log(err)
+        console.log('There was an error connecting to Mongodb:' + err)
     })
     return mongoose
 }

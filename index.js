@@ -13,6 +13,10 @@ const GuildPrefix = require('./Guild')
 
 const ToggleAntiSware = require('./Guild2')
 
+const GuildWelcome = require('./Guild3')
+
+const GuildWelcomeChannel = require('./Guild4')
+
 const {
 	Mongoose, connection
 } = require('mongoose');
@@ -119,6 +123,25 @@ client.on('ready', async() => {
     })
 })
 
+client.on('guildMemberAdd', async(message, member) =>{
+    const welcomemessage = await GuildWelcome.findOne({_id: member.guild.id}).catch(error =>{
+		console.log(`There was a error: ${error}`)
+	})
+    const welcomemessagechannel = await GuildWelcomeChannel.findOne({_id: member.guild.id}).catch(error =>{
+		console.log(`There was a error: ${error}`)
+	})
+    if(!welcomemessage || !welcomemessagechannel) return
+    if(welcomemessage.message === '' || !welcomemessagechannel.channel === ''){
+        return
+    } else{
+        try{
+        member.guild.channels.get(welcomemessagechannel.channel).send(welcomemessage.message)
+        } catch(err){
+            console.log('There was an error sending the welcome message: ' + err)
+        }
+    }
+})
+
 client.on("guildCreate", async (guild) => {
 	await ToggleAntiSware.findOneAndUpdate({
 		_id: guild.id
@@ -138,6 +161,24 @@ client.on("guildCreate", async (guild) => {
 			},{
 				upsert: true
 			})
+            await GuildWelcome.findOneAndUpdate({
+                _id: guild.id
+                },{
+                _id: guild.id,
+                message: '',
+                    
+                },{
+                    upsert: true
+                })
+                await GuildWelcomeChannel.findOneAndUpdate({
+                    _id: guild.id
+                    },{
+                    _id: guild.id,
+                    channel: '',
+                        
+                    },{
+                        upsert: true
+                    })
 	setTimeout(async () => {
     /*
     const channels = await guild.channels.fetch()
