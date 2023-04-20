@@ -137,9 +137,15 @@ client.on('guildMemberAdd', async(member) =>{
     if(!welcomemessage || !welcomemessagechannel) return
     if(welcomemessage.message === '' || !welcomemessagechannel.channel === ''){
         return
-    } else{
+    } 
+    else{
         try{
-        member.guild.channels.cache.get(welcomemessagechannel.channel).send(welcomemessage.message)
+            let WelcomeGuildMessage = welcomemessage.message
+            if(WelcomeGuildMessage.includes('{member}')){
+                const EditWelcomeGuildMessage =  WelcomeGuildMessage.replace('{member}', member.user.username)
+                WelcomeGuildMessage = EditWelcomeGuildMessage;
+            }
+        member.guild.channels.cache.get(welcomemessagechannel.channel).send(WelcomeGuildMessage)
         } catch(err){
             console.log('There was an error sending the welcome message: ' + err)
         }
