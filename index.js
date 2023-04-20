@@ -139,7 +139,7 @@ client.on('guildMemberAdd', async(member) =>{
         return
     } else{
         try{
-        member.guild.channels.get(welcomemessagechannel.channel).send(welcomemessage.message)
+        member.guild.channels.cache.get(welcomemessagechannel.channel).send(welcomemessage.message)
         } catch(err){
             console.log('There was an error sending the welcome message: ' + err)
         }
