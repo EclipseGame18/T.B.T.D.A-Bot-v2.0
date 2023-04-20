@@ -189,6 +189,23 @@ client.on("guildCreate", async (guild) => {
                     },{
                         upsert: true
                     })
+                    const welcomemessagechannel = await GuildWelcomeChannel.findOne({_id: guild.id}).catch(error =>{
+                        console.log(`There was a error: ${error}`)
+                      })
+                        const guildwelcome = await GuildWelcome.findOne({_id: guild.id}).catch(error =>{
+                        console.log(`There was a error: ${error}`)
+                      })
+                      const toggleSware = await ToggleAntiSware.findOne({_id: guild.id}).catch(error =>{
+                        console.log(`There was a error: ${error}`)
+                      })
+                        let guildwelcometoggle;
+                        let welcomemessageschanneltoggle;
+                        if(guildwelcome.message === ''){
+                            guildwelcometoggle = '(nothing)'
+                        }
+                        if(welcomemessagechannel.channel === ''){
+                            welcomemessageschanneltoggle = '(nothing)'
+                        }
 	setTimeout(async () => {
     /*
     const channels = await guild.channels.fetch()
@@ -217,7 +234,7 @@ client.on("guildCreate", async (guild) => {
         //console.log(`Unable to send welcome message in ${guild.name}`)
     //}
     */
-    console.log(`Joined ${guild.name} with ${guild.memberCount} users. ID: ${guild.id}`)
+    console.log(`Joined ${guild.name} with ${guild.memberCount} users. ID: ${guild.id}\nAnti-swear: ${toggleSware.toggle}.\nWelcome message: ${guildwelcometoggle}.\nLog channel: ${welcomemessageschanneltoggle}.`)
     }, 2000);
 });
 
@@ -231,6 +248,7 @@ client.on('messageCreate', async (message) => {
     const toggleSware = await ToggleAntiSware.findOne({_id: message.guild.id}).catch(error =>{
 		console.log(`There was a error: ${error}`)
 	})
+    
 
 	if(toggleSware === null){
 		await ToggleAntiSware.findOneAndUpdate({
@@ -243,7 +261,7 @@ client.on('messageCreate', async (message) => {
 				upsert: true
 			})
 	} 
-
+    try{
 	if (toggleSware.toggle === 'true'){
 		const blacklisted = ['fuck', 'shit', 'ass', 'cock', 'dick', 'c0ck', 'd1ck', 'nigger', 'cunt'];
 		const whitelisted = ['pass', 'mass', 'hass', 'harass']
@@ -263,6 +281,9 @@ client.on('messageCreate', async (message) => {
 		 	}
 		}
 	}
+    }catch{
+        console.log(`Error retreving swear status for ${message.guild.name} (${message.guild.id})`)
+    }
 
     if (message.mentions.has(client.user)) {
         const ping = new EmbedBuilder()

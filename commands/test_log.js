@@ -34,7 +34,7 @@ module.exports = {
     if(!welcomemessagechannel) return ':x: Unable to comply, there is no log channel currentaly set.'
     if(welcomemessagechannel.channel === '') return ':x: Unable to comply, you have disabled guild logging. Use command \`/guild_log_channel\` to enable logging'
     try{
-        guild.channels.cache.get(welcomemessagechannel.channel).send(`This is a log channel test.\nWelcome message plugin is currentaly: \`${welcomeToggle}\`.`)
+        guild.channels.cache.get(welcomemessagechannel.channel).send(`This is a log channel test, logs and welcomes will be sent here.\nWelcome message plugin is currentaly: \`${welcomeToggle}\`.`)
         return 'Test log message has been successfully sent!'
     } catch{
         return `:x: There was an error sending the test message, try checking my permissions or if the channel even exists.\nChannel ID: \`${welcomemessagechannel.channel}\``

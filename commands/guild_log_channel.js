@@ -55,7 +55,7 @@ module.exports = {
         if(newText === ''){
             return `Successfully toggled log channel to: \`off\``
         } else{
-        return `Successfully toggled log channel plugin to: \`on\` and changed the server log channel to: \`${newText}\``
+        return `Successfully toggled log channel plugin to: \`on\` and changed the server log channel to: \`${newText}\`.\nPlease run the \`/test_log\` command to confirm log channel.`
         }
   },
 }
