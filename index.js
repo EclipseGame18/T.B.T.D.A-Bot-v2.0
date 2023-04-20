@@ -123,11 +123,15 @@ client.on('ready', async() => {
     })
 })
 
-client.on('guildMemberAdd', async(message, member) =>{
-    const welcomemessage = await GuildWelcome.findOne({_id: member.guild.id}).catch(error =>{
+client.on('guildMemberAdd', async(member) =>{
+    await member.guild.fetch();
+
+    // Access the guild ID
+    const guildId = member.guild.id;
+    const welcomemessage = await GuildWelcome.findOne({_id: guildId}).catch(error =>{
 		console.log(`There was a error: ${error}`)
 	})
-    const welcomemessagechannel = await GuildWelcomeChannel.findOne({_id: member.guild.id}).catch(error =>{
+    const welcomemessagechannel = await GuildWelcomeChannel.findOne({_id: guildId}).catch(error =>{
 		console.log(`There was a error: ${error}`)
 	})
     if(!welcomemessage || !welcomemessagechannel) return
