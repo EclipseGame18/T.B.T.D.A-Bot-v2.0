@@ -19,7 +19,13 @@ const GuildWelcomeChannel = require('./Guild4')
 
 const ytdl = require('ytdl-core')
 
+const ytsr = require('ytsr')
+
 const ffmpeg = require('ffmpeg-static');
+
+const opus = require('node-opus')
+
+const opusscript = require('opusscript')
 
 const {
 	Mongoose, connection
