@@ -316,7 +316,7 @@ client.on('messageCreate', async (message) => {
         });
         const songName = args.join(' ')
         await queue.join(message.member.voice.channel);
-        let song = await queue.play(songName, { highWaterMark: 3 * 1024 * 1024 }).catch(err => {
+        let song = await queue.play(songName, { highWaterMark: 8 * 1024 * 1024 }).catch(err => {
             //console.log(err);
             message.channel.send('Unable to continue playback, an unknown error occured.')
             if(!guildQueue)
