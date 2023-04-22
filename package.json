@@ -1,23 +1,36 @@
 {
   "name": "t.b.t.d.a_bot",
-  "version": "2.0.1",
+  "version": "2.0.15",
   "description": "This is the re-write of T.B.T.D.A The Discord Bot",
   "main": "index.js",
   "scripts": {
     "test": "node .",
     "start": "node ."
   },
+  "engines": {
+    "node": "18.16.0",
+    "npm": "9.6.4"
+  },
   "author": "Fergus, Eclipse Code18",
   "license": "ISC",
   "dependencies": {
     "@discordjs/opus": "^0.9.0",
-    "@discordjs/voice": "^0.15.0",
+    "@discordjs/voice": "^0.16.0",
+    "apple-music-metadata": "^2.0.1",
     "discord-music-player": "^9.1.1",
+    "discord-ytdl-core": "^5.0.4",
     "discord.js": "^14.9.0",
+    "domhandler": "^5.0.3",
     "ffmpeg-static": "^5.1.0",
+    "htmlparser2": "^8.0.2",
     "isomorphic-unfetch": "^4.0.2",
+    "libsodium-wrappers": "^0.7.11",
     "node-gyp": "^9.3.1",
+    "node-opus": "^0.3.3",
+    "opusscript": "^0.0.8",
+    "spotify-url-info": "^3.2.3",
     "wokcommands": "^2.1.0",
+    "youtubei": "^1.1.2",
     "ytdl-core": "^4.11.4",
     "ytsr": "^3.8.2"
   }

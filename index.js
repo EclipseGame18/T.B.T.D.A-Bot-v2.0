@@ -17,12 +17,17 @@ const GuildWelcome = require('./Guild3')
 
 const GuildWelcomeChannel = require('./Guild4')
 
+const ytdl = require('ytdl-core')
+
+const ffmpeg = require('ffmpeg-static');
+
 const {
 	Mongoose, connection
 } = require('mongoose');
 
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds,
+const client = new Client({ restRequestTimeout: 60000,
+                            intents: [GatewayIntentBits.Guilds,
                                       GatewayIntentBits.MessageContent,
                                       GatewayIntentBits.GuildMessages,
                                       GatewayIntentBits.DirectMessages,
@@ -33,9 +38,7 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds,
                                      partials: [Partials.Channel],
                         });
 
-
-const { RepeatMode } = require('discord-music-player');
-const { Player, MusicCommandManager } = require("discord-music-player");
+const { Player, RepeatMode, Queue, DMPError, DMPErrorMessages } = require("discord-music-player");
 const player = new Player(client, {
 leaveOnEmpty: true,
 leaveOnStop: true,
@@ -105,13 +108,10 @@ await initMessage.channel.send({embeds: [playEmbed]})
         
         
 })
-	
 // Emitted when there was an error in runtime
 .on('error', (error, queue, song) => {
 	console.log(`DMP error: ${error}`)
 })
-
-process.on("unhandledRejection", error => console.log(`There was an unhandled rejection error, but it was caught.\n${error}`));
 
 client.on('ready', async() => {
     console.log(`Logged in as ${client.user.tag}`)
