@@ -17,6 +17,9 @@ module.exports = {
     // interaction.reply
     // WOKCommands will reply to the message or the interaction
     // depending on how the user ran the command (legacy vs slash)
+    if(message){
+      message.react('👋')
+    }
     return {
       content: `Hello ${user.username}, I am ${client.user.username}`,
     }

@@ -285,7 +285,9 @@ client.on('messageCreate', async (message) => {
         console.log(`Error retreving swear status for ${message.guild.name} (${message.guild.id})`)
     }
 
-    if (message.mentions.has(client.user)) {
+    if (message.mentions.has(client.user.id)) {
+        if(message.mentions.everyone) return
+        message.react('👋')
         const ping = new EmbedBuilder()
         .setTitle(`Hello ${message.author.username}`)
         .setDescription(`I am ${client.user.username}, my defult prefix is either **/** or **!**. If you need help please join our [support server.](https://discord.gg/3mkKSGw)`)
