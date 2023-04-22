@@ -43,7 +43,7 @@ leaveOnEnd: false,
 deafenOnJoin: true,
 volume: 100,
 quality: 'high',
-buffer: 5000,
+buffer: 3,
 maxQueueSize: 25
 });
 
@@ -314,8 +314,9 @@ client.on('messageCreate', async (message) => {
                 requestedBy: message.author.username
                 }
         });
+        const songName = args.join(' ')
         await queue.join(message.member.voice.channel);
-        let song = await queue.play(args.join(' ')).catch(err => {
+        let song = await queue.play(songName, { highWaterMark: 3 * 1024 * 1024 }).catch(err => {
             //console.log(err);
             message.channel.send('Unable to continue playback, an unknown error occured.')
             if(!guildQueue)
