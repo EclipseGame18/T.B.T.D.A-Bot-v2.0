@@ -43,7 +43,7 @@ leaveOnEnd: false,
 deafenOnJoin: true,
 volume: 100,
 quality: 'high',
-bufferLength: 24,
+bufferLength: 25,
 maxQueueSize: 25
 });
 
