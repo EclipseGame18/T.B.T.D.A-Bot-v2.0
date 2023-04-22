@@ -298,7 +298,7 @@ client.on('messageCreate', async (message) => {
       }
 
     if(!message.content.startsWith(prefix)) return;
-    let guildQueue = client.player.getQueue(message.guild.id);
+    const guildQueue = client.player.getQueue(message.guild.id);
 
     args[0];
     if(command == 'play'){
@@ -314,11 +314,11 @@ client.on('messageCreate', async (message) => {
         });
         await queue.join(message.member.voice.channel);
         let song = await queue.play(args.join(' ')).catch(err => {
-            //console.log(err);
-            message.channel.send('Unable to continue playback, an unknown error occured.')
+            console.log(`A DMP error occured: ` + err);
+            message.channel.send('Unable to continue playback, an unknown error occured. :shrug:')
             if(!guildQueue)
                 queue.stop();
-                message.channel.send(':x: There was either a error playing the song or there was no song matching the query. Please try that query later.')
+                message.channel.send(':x: There was either a error playing the song or there was no song matching the query.\nPlease try that query again later.')
 
         });
     }
@@ -335,8 +335,8 @@ client.on('messageCreate', async (message) => {
         });
         await queue.join(message.member.voice.channel);
         let song = await queue.playlist(args.join(' ')).catch(err => {
-            //console.log(err);
-            message.channel.send('Unable to continue playback, an unknown error occured.')
+            console.log(`A DMP error occured: ` + err);
+            message.channel.send('Unable to continue playback, an unknown error occured. :shrug:')
             if(!guildQueue)
                 queue.stop();
                 message.channel.send(':x: There was either a error playing the playlist or there was no playlist matching the query. Please try that query later.')
