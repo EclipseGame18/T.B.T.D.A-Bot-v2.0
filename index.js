@@ -35,7 +35,7 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds,
 
 
 const { RepeatMode } = require('discord-music-player');
-const { Player } = require("discord-music-player");
+const { Player, MusicCommandManager } = require("discord-music-player");
 const player = new Player(client, {
 leaveOnEmpty: true,
 leaveOnStop: true,
@@ -43,7 +43,11 @@ leaveOnEnd: false,
 deafenOnJoin: true,
 volume: 100,
 quality: 'high',
+bufferLength: 24,
+maxQueueSize: 25
 });
+
+
 client.player = player;
 
 client.player
