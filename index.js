@@ -276,7 +276,7 @@ try{
 			 
 		 	} else if (message.content.toLowerCase().includes(blacklisted[i].toLowerCase())){
 				message.delete().catch(error =>{
-					console.log(`Failed to delete blacklisted word sent by ${user.username} in ${message.guild.name}`)
+					console.log(`Failed to delete blacklisted word sent by ${user.username} in ${message.guild.name}, ID: ${message.guild.id}`)
 					message.channel.send(`:x: Failed to delete message, try checking my permissions.`)
 				});
 				message.channel.send(`${user}, Please don't use that language here!`).then(msg => {setTimeout(() => msg.delete(), 8000)})
