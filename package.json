@@ -12,7 +12,7 @@
     "npm": "9.6.4"
   },
   "author": "Fergus, Eclipse Code18",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@discordjs/opus": "^0.9.0",
     "@discordjs/voice": "^0.16.0",
