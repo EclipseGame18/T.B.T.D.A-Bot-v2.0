@@ -1,5 +1,7 @@
 const { Client, Events, GatewayIntentBits, Partials, messageLink, Message, EmbedBuilder } = require ('discord.js');
 
+const { VoiceConnection, VoiceConnectionStatus, joinVoiceChannel } = require('@discordjs/voice');
+
 const wokcommands = require('wokcommands');
 
 const path = require('path');
@@ -17,34 +19,26 @@ const GuildWelcome = require('./Guild3')
 
 const GuildWelcomeChannel = require('./Guild4')
 
-const ytdl = require('ytdl-core')
-
-const ytsr = require('ytsr')
-
-const ffmpeg = require('ffmpeg-static');
-
-const opus = require('node-opus')
-
-const opusscript = require('opusscript')
-
 const {
 	Mongoose, connection
 } = require('mongoose');
 
 
-const client = new Client({ restRequestTimeout: 60000,
-                            intents: [GatewayIntentBits.Guilds,
+const client = new Client({ intents: [GatewayIntentBits.Guilds,
                                       GatewayIntentBits.MessageContent,
                                       GatewayIntentBits.GuildMessages,
                                       GatewayIntentBits.DirectMessages,
                                       GatewayIntentBits.GuildMembers,
                                       GatewayIntentBits.GuildVoiceStates,
-                                      GatewayIntentBits.GuildModeration
+                                      GatewayIntentBits.GuildModeration,
+                                      GatewayIntentBits.DirectMessages
                                      ],
                                      partials: [Partials.Channel],
                         });
 
-const { Player, RepeatMode, Queue, DMPError, DMPErrorMessages } = require("discord-music-player");
+
+const { RepeatMode } = require('discord-music-player');
+const { Player } = require("discord-music-player");
 const player = new Player(client, {
 leaveOnEmpty: true,
 leaveOnStop: true,
@@ -53,8 +47,6 @@ deafenOnJoin: true,
 volume: 100,
 quality: 'high',
 });
-
-
 client.player = player;
 
 client.player
@@ -114,10 +106,13 @@ await initMessage.channel.send({embeds: [playEmbed]})
         
         
 })
+	
 // Emitted when there was an error in runtime
 .on('error', (error, queue, song) => {
 	console.log(`DMP error: ${error}`)
 })
+
+process.on("unhandledRejection", error => console.log(`There was an unhandled rejection error, but it was caught.\n${error}`));
 
 client.on('ready', async() => {
     console.log(`Logged in as ${client.user.tag}`)
@@ -256,7 +251,6 @@ client.on('messageCreate', async (message) => {
     const toggleSware = await ToggleAntiSware.findOne({_id: message.guild.id}).catch(error =>{
 		console.log(`There was a error: ${error}`)
 	})
-    
 
 	if(toggleSware === null){
 		await ToggleAntiSware.findOneAndUpdate({
@@ -269,7 +263,7 @@ client.on('messageCreate', async (message) => {
 				upsert: true
 			})
 	} 
-    try{
+try{
 	if (toggleSware.toggle === 'true'){
 		const blacklisted = ['fuck', 'shit', 'ass', 'cock', 'dick', 'c0ck', 'd1ck', 'nigger', 'cunt'];
 		const whitelisted = ['pass', 'mass', 'hass', 'harass']
@@ -289,19 +283,20 @@ client.on('messageCreate', async (message) => {
 		 	}
 		}
 	}
-    }catch{
-        console.log(`Error retreving swear status for ${message.guild.name} (${message.guild.id})`)
-    }
+}catch{
+    console.log(`Error retreving swear status for ${message.guild.name} (${message.guild.id})`)
+}
 
-    if (message.mentions.has(client.user.id)) {
-        if(message.mentions.everyone) return
-        message.react('👋')
-        const ping = new EmbedBuilder()
-        .setTitle(`Hello ${message.author.username}`)
-        .setDescription(`I am ${client.user.username}, my defult prefix is either **/** or **!**. If you need help please join our [support server.](https://discord.gg/3mkKSGw)`)
-        .setColor('#00B9FF')
-        message.channel.send({embeds: [ping]})
-      }
+if (message.mentions.has(client.user.id)) {
+    if(message.mentions.everyone) return
+    message.react('👋')
+    const ping = new EmbedBuilder()
+    .setTitle(`Hello ${message.author.username}`)
+    .setDescription(`I am ${client.user.username}, my defult prefix is either **/** or **!**. If you need help please join our [support server.](https://discord.gg/3mkKSGw)`)
+    .setColor('#00B9FF')
+    message.channel.send({embeds: [ping]})
+  }
+
 
     if(!message.content.startsWith(prefix)) return;
     const guildQueue = client.player.getQueue(message.guild.id);
