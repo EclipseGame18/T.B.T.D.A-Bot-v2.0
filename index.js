@@ -110,9 +110,11 @@ await initMessage.channel.send({embeds: [playEmbed]})
 // Emitted when there was an error in runtime
 .on('error', (error, queue, song) => {
 	console.log(`DMP error: ${error}`)
+    let initMessage = queue.data.queueInitMessage;
+    initMessage.channel.send(`An error occured trying to playback: \`${song}\`. The queue is now cleared.`)
 })
 
-process.on("unhandledRejection", error => console.log(`There was an unhandled rejection error, but it was caught.\n${error}`));
+process.on("unhandledRejection", error => console.log(`There was an unhandled rejection error, but it was caught:\n${error}`));
 
 client.on('ready', async() => {
     console.log(`Logged in as ${client.user.tag}`)
