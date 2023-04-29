@@ -269,6 +269,7 @@ try{
 	if (toggleSware.toggle === 'true'){
 		const blacklisted = ['fuck', 'shit', 'ass', 'cock', 'dick', 'c0ck', 'd1ck', 'nigger', 'cunt'];
 		const whitelisted = ['pass', 'mass', 'hass', 'harass']
+        if(message.channel.nsfw) return
 		
 		for (var i in blacklisted) {
 			const user = message.author;
