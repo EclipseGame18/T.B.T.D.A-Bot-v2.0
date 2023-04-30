@@ -1,4 +1,4 @@
-const { Client, Events, GatewayIntentBits, Partials, messageLink, Message, EmbedBuilder } = require ('discord.js');
+const { Client, Events, GatewayIntentBits, Partials, messageLink, Message, EmbedBuilder, ActivityType } = require ('discord.js');
 
 const { VoiceConnection, VoiceConnectionStatus, joinVoiceChannel } = require('@discordjs/voice');
 
@@ -118,6 +118,16 @@ process.on("unhandledRejection", error => console.log(`There was an unhandled re
 
 client.on('ready', async() => {
     console.log(`Logged in as ${client.user.tag}`)
+
+    client.user?.setPresence({
+        status: 'online',
+        activities: [
+            {
+                name: "Version 2.0 pre 1.5",
+                type: ActivityType.Watching,
+            }
+        ]
+    })
 
     new wokcommands({
         client,
