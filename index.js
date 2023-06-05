@@ -1,8 +1,10 @@
-const { Client, Events, GatewayIntentBits, Partials, messageLink, Message, EmbedBuilder, ActivityType } = require ('discord.js');
+const { Client, Events, GatewayIntentBits, Partials, messageLink, Message, EmbedBuilder, ActivityType, PermissionsBitField } = require ('discord.js');
 
 const { VoiceConnection, VoiceConnectionStatus, joinVoiceChannel } = require('@discordjs/voice');
 
 const wokcommands = require('wokcommands');
+
+const Economy = require('discord-economy-super/mongodb')
 
 const path = require('path');
 require("dotenv/config");
@@ -35,6 +37,53 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds,
                                      ],
                                      partials: [Partials.Channel],
                         });
+
+
+let eco = new Economy({
+    connection: {
+        connectionURI: 'mongodb+srv://Bot_Agent:Minecraft18@bot-settings.miusd.mongodb.net/test?authSource=admin&replicaSet=atlas-udb06o-shard-0&readPreference=primary&ssl=true', // mongodb connection URI
+        collectionName: 'eco-database', // specify if using MongoDB version (optional)
+        dbName: 'eco-db', // specify if using MongoDB version (optional)
+        mongoClientProperties: {
+            keepAlive: true,
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        } // specify if using MongoDB version (optional)
+    },
+    dailyAmount: 100,
+    workAmount: [15, 75],
+    weeklyAmount: [100, 150],
+    monthlyAmount: [200, 300],
+    hourlyAmount: 10,
+    dailyCooldown: 86400000,
+    workCooldown: 14400000,
+    weeklyCooldown: 604800000,
+    monthlyCooldown: 2629746000,
+    hourlyCooldown: 3600000,
+    dateLocale: 'au',
+    updater: {
+
+        // enable or disable the console message
+        // when the module is out of date
+        // (when using the older version and newer is available)
+        checkUpdates: true,
+
+        // enable or disable the console message when the module is up to date
+        // (when using the latest version)
+        upToDateMessage: true
+    },
+    errorHandler: {
+
+        // enable or disable module start up errors handling
+        handleErrors: true,
+
+        // number of attempts to start the module up
+        attempts: 5,
+
+        // time between each aattempt (in milliseconds)
+        time: 5000
+    },
+})
 
 
 const { RepeatMode } = require('discord-music-player');
@@ -128,7 +177,6 @@ client.on('ready', async() => {
             }
         ]
     })
-
     new wokcommands({
         client,
         commandsDir: path.join(__dirname, 'commands'),
@@ -137,6 +185,12 @@ client.on('ready', async() => {
         
     })
 })
+
+eco.on('ready', economy => {
+    console.log(`Economy module online`);
+    console.log('Music module online')
+    eco = economy
+  })
 
 client.on('guildMemberAdd', async(member) =>{
     await member.guild.fetch();
@@ -253,6 +307,8 @@ client.on("guildCreate", async (guild) => {
     }, 2000);
 });
 
+const getUser = userID => client.users.cache.get(userID)
+
 client.on('messageCreate', async (message) => {
     if(message.author.bot) return;
 
@@ -313,6 +369,62 @@ if (message.mentions.has(client.user.id)) {
 
     if(!message.content.startsWith(prefix)) return;
     const guildQueue = client.player.getQueue(message.guild.id);
+
+    let guild = eco.cache.guilds.get({
+        guildID: message.guild.id
+    })
+
+    let user = eco.cache.users.get({
+        memberID: message.author.id,
+        guildID: message.guild.id
+    })
+
+    const userID = message.mentions.members?.first()?.id ||
+        message.guild.members.cache.find(member => member.user.username == args[0])?.id
+        || getUser(args[0])?.id
+
+    let argumentUser = eco.cache.users.get({
+        memberID: userID,
+        guildID: message.guild.id
+    })
+
+    const shop = eco.cache.shop.get({
+        guildID: message.guild.id
+    }) || []
+
+    const inventory = eco.cache.inventory.get({
+        guildID: message.guild.id,
+        memberID: message.author.id
+    }) || []
+
+    const history = eco.cache.history.get({
+        guildID: message.guild.id,
+        memberID: message.author.id
+    }) || []
+
+    if (userID && !argumentUser) {
+        argumentUser = await eco.users.create(userID, message.guild.id)
+    }
+
+    if (!guild) {
+        guild = await eco.guilds.create(message.guild.id)
+    }
+
+    if (!user) {
+        const ecoUser = await eco.users.get(message.author.id, message.guild.id)
+
+        if (ecoUser) {
+            eco.cache.users.update({
+                guildID: message.guild.id,
+                memberID: message.author.id
+            })
+
+            user = ecoUser
+            return
+        }
+
+        user = await guild.users.create(message.author.id)
+    }
 
     args[0];
     if(command == 'play'){
@@ -564,6 +676,7 @@ if (message.mentions.has(client.user.id)) {
     }
 
     else if(command === 'remove') {
+        if(!guildQueue) return message.channel.send(':x: Unable to comply, the queue is currentaly empty.')
         try{
         let song = args[0]
         if(!song) return message.reply('Please specify which song to remove.')
@@ -593,6 +706,927 @@ if (message.mentions.has(client.user.id)) {
             return message.channel.send(':x: Unable to comply, the queue is currentaly empty.')
         }
         
+    }
+    else if(command === 'bal'){
+        const [userID] = args
+
+        const member =
+            message.mentions.users.first() ||
+            getUser(userID) || message.author
+
+
+        const economyUser = member ? argumentUser : user
+        const balanceData = await eco.cache.balance.get({ memberID: member.id, guildID: message.guild.id })
+
+        const [balance, bank] = [balanceData?.money, balanceData?.bank]
+
+        message.channel.send(
+            `${getUser(economyUser.id) || message.author}'s balance:\n` +
+            `Coins: **${balance || 0}**.\n` +
+            `Coins in bank: **${bank || 0}**.`
+        )
+    }
+
+    else if (command === 'add_coins'){
+        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return message.reply(`:x: Unable to comply, you do not have \`Manage_Guild\` permision.`)
+        const [userID] = args
+        const user = message.mentions.users.first() || getUser(userID)
+
+        if (!userID) {
+            return message.channel.send(
+                `${message.author}, please specify a user to add money to.`
+            )
+        }
+
+        if (!user) {
+            return message.channel.send(
+                `${message.author}, user not found.`
+            )
+        }
+
+        const amount = parseInt(args[1])
+
+        if (!amount) {
+            return message.channel.send(
+                `${message.author}, please specify an amount to add.`
+            )
+        }
+
+        if (isNaN(amount)) {
+            return message.channel.send(
+                `${message.author}, please specify a valid amount number.`
+            )
+        }
+
+
+        await argumentUser.balance.add(amount)
+
+        message.channel.send(
+            `${message.author}, successfully added **${amount}** coins to **${user}**'s balance.`
+        )
+    }
+    else if (command === 'remove_coins'){
+        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return message.reply(`:x: Unable to comply, you do not have \`Manage_Guild\` permision.`)
+        const [userID] = args
+        const user = message.mentions.users.first() || getUser(userID)
+
+        if (!userID) {
+            return message.channel.send(
+                `${message.author}, please specify a user to subtract money from.`
+            )
+        }
+
+        if (!user) {
+            return message.channel.send(
+                `${message.author}, user not found.`
+            )
+        }
+
+        const userBalance = await argumentUser.balance.get() || 0
+        const amount = args[1] == 'all' ? userBalance : parseInt(args[1])
+
+        if (!amount) {
+            return message.channel.send(
+                `${message.author}, please specify an amount to subtract.`
+            )
+        }
+
+        if (isNaN(amount)) {
+            return message.channel.send(
+                `${message.author}, please specify a valid amount number.`
+            )
+        }
+
+
+        await argumentUser.balance.subtract(amount)
+
+        message.channel.send(
+            `${message.author}, successfully removed **${amount}** coins from **${user}**'s balance.`
+        )
+    }
+    else if (command === 'daily'){
+        const dailyResult = await user.rewards.getDaily()
+
+        if(dailyResult.claimed){
+            message.channel.send(`Congradulations ${message.author}, you claimed you daily reward of \`${dailyResult.reward}\` coins!`)
+        }
+
+        if (!dailyResult.claimed) {
+            const cooldownTime = dailyResult.cooldown.time
+
+            const cooldownTimeString =
+                `${cooldownTime.days ? `**${cooldownTime.days}** days, ` : ''}` +
+
+                `${cooldownTime.days || cooldownTime.hours ?
+                    `**${cooldownTime.hours}** hours, `
+                    : ''}` +
+
+                `${cooldownTime.hours || cooldownTime.minutes ?
+                    `**${cooldownTime.minutes}** minutes, ` :
+                    ''}` +
+                `**${cooldownTime.seconds}** seconds`
+
+
+            return message.channel.send(
+                `${message.author}, you can claim your daily reward in ${cooldownTimeString}.`
+            )
+        }
+    }
+    else if(command === 'monthly'){
+        const monthlyResult = await user.rewards.getMonthly()
+
+        if(monthlyResult.claimed){
+            message.channel.send(`Congradulations ${message.author}, you claimed you daily reward of \`${monthlyResult.reward}\` coins!`)
+        }
+
+        if (!monthlyResult.claimed) {
+            const cooldownTime = monthlyResult.cooldown.time
+
+            const cooldownTimeString =
+                `${cooldownTime.days ? `**${cooldownTime.days}** days, ` : ''}` +
+
+                `${cooldownTime.days || cooldownTime.hours ?
+                    `**${cooldownTime.hours}** hours, `
+                    : ''}` +
+
+                `${cooldownTime.hours || cooldownTime.minutes ?
+                    `**${cooldownTime.minutes}** minutes, ` :
+                    ''}` +
+                `**${cooldownTime.seconds}** seconds`
+
+
+            return message.channel.send(
+                `${message.author}, you can claim your monthly reward in ${cooldownTimeString}.`
+            )
+        }
+    }
+    else if (command === 'hourly'){
+        const hourlyResult = await user.rewards.getHourly()
+
+        if(hourlyResult.claimed){
+            message.channel.send(`Congradulations ${message.author}, you claimed you hourly reward of \`${hourlyResult.reward}\` coins!`)
+        }
+
+        if (!hourlyResult.claimed) {
+            const cooldownTime = hourlyResult.cooldown.time
+
+            const cooldownTimeString =
+                `${cooldownTime.days ? `**${cooldownTime.days}** days, ` : ''}` +
+
+                `${cooldownTime.days || cooldownTime.hours ?
+                    `**${cooldownTime.hours}** hours, `
+                    : ''}` +
+
+                `${cooldownTime.hours || cooldownTime.minutes ?
+                    `**${cooldownTime.minutes}** minutes, ` :
+                    ''}` +
+                `**${cooldownTime.seconds}** seconds`
+
+
+            return message.channel.send(
+                `${message.author}, you can claim your hourly reward in ${cooldownTimeString}.`
+            )
+        }
+    }
+    else if (command === 'work'){
+        const workResult = await user.rewards.getWork()
+
+        if (!workResult.claimed) {
+            const cooldownTime = workResult.cooldown.time
+
+            const cooldownTimeString =
+                `${cooldownTime.days ? `**${cooldownTime.days}** days, ` : ''}` +
+
+                `${cooldownTime.days || cooldownTime.hours ?
+                    `**${cooldownTime.hours}** hours, `
+                    : ''}` +
+
+                `${cooldownTime.hours || cooldownTime.minutes ?
+                    `**${cooldownTime.minutes}** minutes, ` :
+                    ''}` +
+                `**${cooldownTime.seconds}** seconds`
+
+
+            return message.channel.send(
+                `${message.author}, you can work again in ${cooldownTimeString}.`
+            )
+        }
+
+        if(workResult.reward < 30){
+            message.channel.send(
+                `${message.author}, you did a terrible job and only receved \`${workResult.reward}\` coins.`
+            )
+        }if(workResult.reward > 50){
+            message.channel.send(
+                `${message.author}, you did an exellant job! You receved \`${workResult.reward}\` coins.`
+            )
+        }else{
+            if(workResult.reward < 30) return
+            message.channel.send(
+                `${message.author}, you did a decent job and receved \`${workResult.reward}\` coins.`
+            )
+            }
+    }
+    else if (command === 'weekly'){
+        const weeklyResult = await user.rewards.getWeekly()
+
+        if (!weeklyResult.claimed) {
+            const cooldownTime = weeklyResult.cooldown.time
+
+            const cooldownTimeString =
+                `${cooldownTime.days ? `**${cooldownTime.days}** days, ` : ''}` +
+
+                `${cooldownTime.days || cooldownTime.hours ?
+                    `**${cooldownTime.hours}** hours, `
+                    : ''}` +
+
+                `${cooldownTime.hours || cooldownTime.minutes ?
+                    `**${cooldownTime.minutes}** minutes, ` :
+                    ''}` +
+                `**${cooldownTime.seconds}** seconds`
+
+
+            return message.channel.send(
+                `${message.author}, you can claim your weekly reward in ${cooldownTimeString}.`
+            )
+        }
+
+        message.channel.send(
+            `${message.author}, you claimed your **${weeklyResult.reward}** weekly coins!`
+        )
+    }
+    else if (command === 'transfer'){
+        const [id, amountString] = args
+
+        const sender = user
+        const receiver = argumentUser
+
+        const senderBalance = await sender.balance.get()
+        const amount = amountString == 'all' ? senderBalance : parseInt(amountString)
+
+        if (!id) {
+            return message.channel.send(
+                `${message.author}, please specify a user to transfer coins to.`
+            )
+        }
+
+        if (!userID) {
+            return message.channel.send(`${message.author}, user not found.`)
+        }
+
+        if (!amount) {
+            return message.channel.send(
+                `${message.author}, please specify an amount of coins to transfer.`
+            )
+        }
+
+        if (senderBalance < amount) {
+            return message.channel.send(
+                `:x: ${message.author}, you don't have enough coins to perform this transfer.\nYou have: \`${senderBalance}\` coins.\nYou specified: \`${amount}\` coins.`
+            )
+        }
+
+        const transferingResult = await receiver.balance.transfer({
+            amount,
+            senderMemberID: message.author.id,
+
+            sendingReason: `transfered ${amount} coins to ${getUser(argumentUser.id).tag}.`,
+            receivingReason: `received ${amount} coins from ${message.author.tag}.`
+        })
+
+        message.channel.send(
+            `${message.author}, you transfered **${transferingResult.amount}** coins to ${getUser(argumentUser.id)}.`
+        )
+    }
+    else if (command === 'steal'){
+        const [userID] = args
+        const user = message.mentions.users.first() || getUser(userID)
+        function generateRandom(min = -15, max = 30) {
+
+            // find diff
+            let difference = max - min;
+        
+            // generate random number 
+            let rand = Math.random();
+        
+            // multiply with difference 
+            rand = Math.floor( rand * difference);
+        
+            // add with min value 
+            rand = rand + min;
+        
+            return rand;
+        }
+        
+
+        if(!userID){
+            return message.channel.send(`${message.author}, please specify a member to steal form.\n*!steal {@member}*`)
+        }
+        if (!user) {
+            return message.channel.send(
+                `${message.author}, user not found.`
+            )
+        }
+        const userBalance = await argumentUser.balance.get() || 0
+        const amount = generateRandom()
+
+        if(userBalance < 30){
+            return message.channel.send(
+                `${message.author}, that user is too poor to steal form, try stealing form someone richer.`
+            )
+        }
+
+        if(amount < 0){
+            const newAugment = eco.cache.users.get({
+                memberID: message.author.id,
+                guildID: message.guild.id
+            })
+            await newAugment.balance.subtract(20)
+            return message.channel.send(
+                `${message.author}, ha ha! You were caught, you have paid a fine of 20 coins.`
+            )
+        }
+
+        await argumentUser.balance.subtract(amount)
+        const newAugmentSuccess = eco.cache.users.get({
+            memberID: message.author.id,
+            guildID: message.guild.id
+        })
+        await newAugmentSuccess.balance.add(amount)
+        message.channel.send(
+            `${message.author}, you successfully stole \`${amount}\` coins!`
+        )
+
+    }
+    else if (command === 'dep'){
+        const [amountString] = args
+
+        const userBalance = await user.balance.get()
+        const amount = amountString == 'all' ? userBalance : parseInt(amountString)
+
+        if (userBalance < amount || !userBalance) {
+            return message.channel.send(
+                `:x: ${message.author}, you don't have enough coins to perform this deposit.\nYou have: \`${userBalance}\` coins.\nYou specified \`${amount}\` coins.`
+            )
+        }
+
+        await user.balance.subtract(amount, `depositted ${amount} coins`)
+        await user.bank.add(amount, `depositted ${amount} coins`)
+
+        message.channel.send(
+            `${message.author}, you depositted **${amount}** coins into your bank.`
+        )
+    }
+    else if (command === 'withdraw'){
+        const [amountString] = args
+
+        const userBankBalance = await user.bank.get()
+        const amount = amountString == 'all' ? userBankBalance : parseInt(amountString)
+
+        if (userBankBalance < amount || !userBankBalance) {
+            return message.channel.send(
+                `${message.author}, you don't have enough coins in your bank to perform this withdraw.\nYou have: \`${userBankBalance}\`\nYou specified: \`${amount}\``
+            )
+        }
+
+        await user.balance.add(amount, `withdrew ${amount} coins`)
+        await user.bank.subtract(amount, `withdrew ${amount} coins`)
+
+        message.channel.send(
+            `${message.author}, you withdrew **${amount}** coins from your bank.`
+        )
+    }
+    else if (command === 'lb'){
+        const rawLeaderboard = await guild.leaderboards.money()
+
+        const leaderboard = rawLeaderboard
+            .filter(lb => !getUser(lb.userID)?.bot)
+            .filter(lb => !!lb.money)
+
+        if (!leaderboard.length) {
+            return message.channel.send(`${message.author}, there are no users in the leaderboard.`)
+        }
+
+        message.channel.send(
+            `Richest users in **${message.guild.name}**:\n\n` +
+            `${leaderboard
+                .map((lb, index) => `${index + 1} - <@${lb.userID}> - **${lb.money}** coins in wallet`)
+                .join('\n')}`
+        )
+    }
+    else if (command === 'shop'){
+        const guildShop = shop.filter(item => !item.custom.hidden)
+
+        if (!guildShop.length) {
+            return message.channel.send(`${message.author}, there are no items in the shop.`)
+        }
+
+        message.channel.send(
+            `Server shop for **${message.guild.name}** | \`${guildShop.length} items\`:\n\n` +
+
+            `${guildShop
+                .map((item, index) =>
+                    `${index + 1} - ${item.custom.locked ? ' 🔒 | ' : ' '}${item.custom.emoji} ` +
+                    `**${item.name}** (ID: \`${item.id}\`) - \`${item.price}\` coins\n` +
+                    `Description: \`${item.description}\`. Max amount in inventory: \`${item.maxAmount}\`.`
+                    )
+                .join('\n')}`
+        )
+    }
+    else if (command === 'item_info'){
+        const [itemID] = args
+
+        const item = shop.find(item => item.id == parseInt(itemID) || item.name == itemID)
+
+        if (!itemID) {
+            return message.channel.send(`${message.author}, please specify an item.`)
+        }
+
+        if (!item || item?.custom?.hidden) {
+            return message.channel.send(`${message.author}, the item either cannot be found, or it has been hidden by an admin.`)
+        }
+
+        message.channel.send(
+            `**${item.custom.emoji} ${item.name}** - Item Info:\n\n` +
+
+            `Name: \`${item.name}\`` +
+            `${item.custom.locked ? ` [🔒 | Locked since ${new Date(item.custom.lockedSince)
+                .toLocaleString()}]` : ''}\n` +
+
+            `ID: \`${item.id}\`\n` +
+            `Emoji: ${item.custom.emoji}\n\n` +
+
+            `Price: \`${item.price}\` coins\n` +
+            `Description: \`${item.description}\`\n` +
+            `Max quantity in inventory: \`${item.maxAmount}\`\n\n` +
+
+            `${item.role ? `Role: **<@&${item.role}>**\n` : ''}` +
+            `Hidden: \`${item.custom.hidden ? 'Yes' : 'No'}\`\n` +
+            `Locked: \`${item.custom.locked ? 'Yes' : 'No'}\`\n\n` +
+
+            `Message on use: \`${item.message}\`\n` +
+            `Created at: \`${item.date}\``
+        )
+    }
+    else if (command === 'add_shop_item'){
+        const [name, emoji, priceString, description, maxAmount] = args
+
+        if(args[0] === 'syntax'){
+            return message.channel.send(`Syntax for \`!add_shop_item\` command:\n\`!add_shop_item\` \`{name}\` \`{emoji}\` \`{price}\` \`{description_seperated_by_underscores}\` \`{max amount allowed in inventory [optional]}\` \`{message on use NO UNDERSCORES [optional]}\``)
+        }
+
+        const price = parseInt(priceString)
+        const messageOnUse = args.slice(5).join(' ')
+
+        // message on use is optional and defaults to `You have used this item!`
+
+        // supports choosing a random string from a specified strings list with following syntax:
+        // [random="str", "str1", "str2"]
+
+        // for example, if specifying `What a [random="wonderful", "great", "sunny"] day!` as message on use
+        // then in returned message, `[random="wonderful", "great", "sunny"]` will be replaced with either
+        // "wonderful", "great" or "sunny".
+
+        if (!name) {
+            return message.channel.send(`${message.author}, please provide a name for the item.\n*!add_shop_item {name} {emoji} {price} {description_seperated_by_underscores} {max amount allowed in inventory [optional]} {message on use NO UNDERSCORES [optional]}*`)
+        }
+
+        if (!emoji) {
+            return message.channel.send(`${message.author}, please provide an emoji for the item.\n*!add_shop_item {name} {emoji} {price} {description_seperated_by_underscores} {max amount allowed in inventory [optional]} {message on use NO UNDERSCORES [optional]}*`)
+        }
+
+        if (!price) {
+            return message.channel.send(`${message.author}, please provide a price for the item.\n*!add_shop_item {name} {emoji} {price} {description_seperated_by_underscores} {max amount allowed in inventory [optional]} {message on use NO UNDERSCORES [optional]}*`)
+        }
+        if (!description){
+            return message.channel.send(`${message.author}, please provide a description for the item.\n*!add_shop_item {name} {emoji} {price} {description_seperated_by_underscores} {max amount allowed in inventory [optional]} {message on use NO UNDERSCORES [optional]}*`)
+        }
+        if (maxAmount){
+            if(isNaN(maxAmount)){
+                return message.channel.send(`${message.author}, your maxmum amount allowed in inventory specification must be a number.`)
+            }
+        }
+
+        const newItem = await guild.shop.addItem({
+            name,
+            price,
+            description,
+            maxAmount,
+            message: messageOnUse || '',
+
+            custom: {
+                emoji,
+                hidden: false,
+                locked: false,
+                hiddenSince: null,
+                lockedSince: null
+            }
+        })
+
+        message.channel.send(
+            `${message.author}, you added **${newItem.name}** for **${newItem.price}** coins to the shop.`
+        )
+    }
+    else if (command === 'remove_shop_item'){
+        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return message.reply(`:x: Unable to comply, you do not have \`Manage_Guild\` permision.`)
+        const [itemID] = args
+
+        const item = shop.find(item => item.id == parseInt(itemID) || item.name == itemID)
+
+        if (!item) {
+            return message.channel.send(`${message.author}, item not found.`)
+        }
+
+        await item.delete()
+
+        message.channel.send(
+            `${message.author}, you removed \`${item.name}\` from the shop.`
+        )
+    }
+    else if (command === 'edit_item'){
+        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return message.reply(`:x: Unable to comply, you do not have \`Manage_Guild\` permision.`)
+        if(args[0] === 'syntax'){
+            return message.channel.send(`Syntax for \`!edit_item\` command:\n\`!edit_item\` \`{item ID}\` \`{item property}\` \`{new value}\``)
+        }
+        const itemProperties = ['description', 'price', 'name', 'message', 'maxAmount']
+
+        const [itemID, itemProperty] = args
+        const newValue = args.slice(2).join(' ')
+
+        const item = shop.find(item => item.id == parseInt(itemID) || item.name == itemID)
+
+        if (!itemID) {
+            return message.channel.send(`${message.author}, please provide an item ID.`)
+        }
+
+        if (!item) {
+            return message.channel.send(`${message.author}, item not found.`)
+        }
+
+        if (!itemProperty) {
+            return message.channel.send(
+                `${message.author}, please provide an item property to change.\nValid item properties are: ${itemProperties.map(prop => `\`${prop}\``).join(', ')}`
+            )
+        }
+
+        if (!itemProperties.includes(itemProperty)) {
+            return message.channel.send(
+                `${message.author}, item property you specified is not valid.\nValid item properties are: ${itemProperties.map(prop => `\`${prop}\``).join(', ')}`
+            )
+        }
+
+        if (!newValue) {
+            return message.channel.send(`${message.author}, please provide a new value for the item property.`)
+        }
+
+        await item.edit(itemProperty, newValue)
+
+        message.channel.send(
+            `${message.author}, item \`${item.id}\`'s property: \`${itemProperty}\` has been changed to: \`${newValue}\``
+        )
+    }
+    else if (command === 'hide_item'){
+        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return message.reply(`:x: Unable to comply, you do not have \`Manage_Guild\` permision.`)
+        const [itemID] = args
+        const item = shop.find(item => item.id == parseInt(itemID) || item.name == itemID)
+
+        if (!itemID) {
+            return message.channel.send(`${message.author}, please provide an item ID.`)
+        }
+
+        if (!item) {
+            return message.channel.send(`${message.author}, item not found.`)
+        }
+
+        if (item.custom.hidden) {
+            return message.channel.send(`${message.author}, item is already hidden.`)
+        }
+
+        await item.setCustom({
+            emoji: item.custom.emoji,
+            hidden: true,
+            hiddenSince: Date.now(),
+            locked: item.custom.locked,
+            lockedSince: item.custom.lockedSince
+        })
+
+        message.channel.send(
+            `${message.author}, you hid the item **${item.name}** from the shop.`
+        )
+    }
+    else if (command === 'hidden_shop'){
+        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return message.reply(`:x: Unable to comply, you do not have \`Manage_Guild\` permision.`)
+        const hiddenShop = shop.filter(item => item.custom.hidden)
+
+        if (!hiddenShop.length) {
+            return message.channel.send(`${message.author}, there are no hidden items in the shop.`)
+        }
+
+        message.channel.send(
+            `Server hidden shop for **${message.guild.name}** | \`${hiddenShop.length} items\`:\n\n` +
+
+            `${hiddenShop
+                .map((item, index) =>
+                    `${index + 1} - ${item.custom.locked ? ' 🔒 | ' : ' '}${item.custom.emoji} ` +
+                    `**${item.name}** (ID: \`${item.id}\`) - \`${item.price}\` coins ` +
+                    `(Hidden since \`${new Date(item.custom.hiddenSince).toLocaleString()}\`)\n` +
+                    `Description: \`${item.description}\`. Max amount in inventory: \`${item.maxAmount}\`. Item use message: \`${item.message}\``
+                )
+                .join('\n')}`
+        )
+    }
+    else if (command === 'item_unhide'){
+        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return message.reply(`:x: Unable to comply, you do not have \`Manage_Guild\` permision.`)
+        const [itemID] = args
+        const item = shop.find(item => item.id == parseInt(itemID) || item.name == itemID)
+
+        if (!itemID) {
+            return message.channel.send(`${message.author}, please provide an item ID.`)
+        }
+
+        if (!item) {
+            return message.channel.send(`${message.author}, item not found.`)
+        }
+
+        if (!item.custom.hidden) {
+            return message.channel.send(`${message.author}, item is already visible.`)
+        }
+
+        await item.setCustom({
+            emoji: item.custom.emoji,
+            hidden: false,
+            hiddenSince: null,
+            locked: item.custom.locked,
+            lockedSince: item.custom.lockedSince
+        })
+
+        message.channel.send(
+            `${message.author}, item **${item.name}** is now visible in the shop.`
+        )
+    }
+    else if (command === 'lock_item'){
+        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return message.reply(`:x: Unable to comply, you do not have \`Manage_Guild\` permision.`)
+        const [itemID] = args
+        const item = shop.find(item => item.id == parseInt(itemID) || item.name == itemID)
+
+        if (!itemID) {
+            return message.channel.send(`${message.author}, please provide an item ID.`)
+        }
+
+        if (!item) {
+            return message.channel.send(`${message.author}, item not found.`)
+        }
+
+        if (item.custom.locked) {
+            return message.channel.send(`${message.author}, item is already locked.`)
+        }
+
+        await item.setCustom({
+            emoji: item.custom.emoji,
+            hidden: item.custom.hidden,
+            hiddenSince: item.custom.hiddenSince,
+            locked: true,
+            lockedSince: Date.now()
+        })
+
+        message.channel.send(
+            `${message.author}, you locked the item **${item.name}** in the shop.`
+        )
+    }
+    else if (command === 'locked_shop'){
+        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return message.reply(`:x: Unable to comply, you do not have \`Manage_Guild\` permision.`)
+        const lockedShop = shop.filter(item => item.custom.locked)
+
+        if (!lockedShop.length) {
+            return message.channel.send(`${message.author}, there are no locked items in the shop.`)
+        }
+
+        message.channel.send(
+            `Server locked shop for **${message.guild.name}** | \`${lockedShop.length} items\`:\n\n` +
+
+            `${lockedShop
+                .map((item, index) =>
+                    `${index + 1} - ${item.custom.locked ? ' 🔒 | ' : ' '}${item.custom.emoji} ` +
+                    `**${item.name}** (ID: \`${item.id}\`) - \`${item.price}\` coins ` +
+                    `(Locked since \`${new Date(item.custom.lockedSince).toLocaleString()}\`)\n` +
+                    `Description: \`${item.description}\`. Max amount in inventory: \`${item.maxAmount}\`. Item use message: \`${item.message}\``
+                )
+                .join('\n')}`
+        )
+    }
+    else if (command === 'item_unlock'){
+        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return message.reply(`:x: Unable to comply, you do not have \`Manage_Guild\` permision.`)
+        const [itemID] = args
+
+        const item = shop.find(item => item.id == parseInt(itemID) || item.name == itemID)
+
+        if (!itemID) {
+            return message.channel.send(`${message.author}, please provide an item ID.`)
+        }
+
+        if (!item) {
+            return message.channel.send(`${message.author}, item not found.`)
+        }
+
+        if (!item.custom.locked) {
+            return message.channel.send(`${message.author}, item is already unlocked.`)
+        }
+
+        await item.setCustom({
+            emoji: item.custom.emoji,
+            hidden: item.custom.hidden,
+            hiddenSince: item.custom.hiddenSince,
+            locked: false,
+            lockedSince: null
+        })
+
+        message.channel.send(
+            `${message.author}, you unlocked the item **${item.name}** in the shop.`
+        )
+    }
+    else if (command === 'clear_shop'){
+        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return message.reply(`:x: Unable to comply, you do not have \`Manage_Guild\` permision.`)
+        if(args[0] === 'confirm'){
+        if (!shop.length) {
+            return message.channel.send(`${message.author}, there are no items in the shop.`)
+        }
+
+        await guild.shop.clear()
+
+        message.channel.send(
+            `${message.author}, you cleared \`${shop.length}\` items from the shop.`
+        )
+        }
+        else{
+            return message.channel.send(`${message.author}, please type \`confirm\` if you wish to clear the entire guild shop. This cannot be undone.`)
+        }
+    }
+    else if (command === 'inv'){
+        const userInventory = inventory.filter(item => !item.custom.hidden)
+
+        if (!userInventory.length) {
+            return message.channel.send(`${message.author}, you don't have any items in your inventory.`)
+        }
+
+        const cleanInventory = [...new Set(userInventory.map(item => item.name))]
+            .map(itemName => shop.find(shopItem => shopItem.name == itemName))
+            .map(item => {
+                const quantity = userInventory.filter(invItem => invItem.name == item.name).length
+
+                return {
+                    quantity,
+                    totalPrice: item.price * quantity,
+                    item
+                }
+            })
+
+        message.channel.send(
+            `${message.author}, here's your inventory [\`${userInventory.length} items\`]:\n\n` +
+            cleanInventory
+                .map(
+                    (data, index) =>
+                        `${index + 1} - x${data.quantity} ${data.item.custom.emoji} ` +
+                        `**${data.item.name}** (ID: \`${data.item.id}\`) ` +
+                        `for \`${data.totalPrice}\` coins`
+                )
+                .join('\n')
+        )
+    }
+    else if (command === 'clear_inv'){
+        if(args[0] === 'confirm'){
+        if (!inventory.length) {
+            return message.channel.send(`${message.author}, you don't have any items in your inventory.`)
+        }
+
+        await user.inventory.clear()
+
+        message.channel.send(
+            `${message.author}, cleared **${inventory.length}** items from your inventory.`
+        )
+        }
+        else{
+            message.channel.send(`${message.author}, please type \`confirm\` if you wish to clear your entire inventory. This cannot be undone.`)
+        }
+    }
+    else if (command === 'history'){
+        const userHistory = history.filter(item => !item.custom.hidden)
+
+        if (!userHistory.length) {
+            return message.channel.send(`${message.author}, you don't have any items in your purchases history.`)
+        }
+
+        message.channel.send(
+            `${message.author}, here's your purchase history [**${userHistory.length} items**]:\n\n` +
+            userHistory
+                .map(
+                    item => `x${item.quantity} ${item.custom.emoji} **${item.name}** - ` +
+                        `\`${item.price}\` coins. Purchased: \`${item.date}\``
+                )
+                .join('\n')
+        )
+    }
+    else if (command === 'clear_history'){
+        if(args[0] === 'confirm'){
+        if (!history.length) {
+            return message.channel.send(`${message.author}, you don't have any items in your purchases history.`)
+        }
+
+        await user.history.clear()
+
+        message.channel.send(
+            `${message.author}, cleared **${history.length}** items from your purchases history.`
+        )
+        }
+        else{
+            message.channel.send(`${message.author}, please type \`confirm\` if you wish to clear your entire purchase history. This cannot be undone.`)
+        }
+    }
+    else if (command === 'buy'){
+        if(args[0] === 'syntax'){
+            return message.channel.send(`Syntax for \`!buy\` command:\n\`!buy\` \`{item ID}\` \`{item quantity}\``)
+        }
+        const [itemID, quantityString] = args
+        const quantity = parseInt(quantityString) || 1
+
+        const item = shop.find(item => item.id == parseInt(itemID) || item.name == itemID)
+
+        if (!itemID) {
+            return message.channel.send(`${message.author}, please specify an item.`)
+        }
+
+        if (!item || item?.custom?.hidden) {
+            return message.channel.send(`${message.author}, the item either cannot be found, or it has been hidden by an admin.`)
+        }
+
+        if (item.custom.locked) {
+            return message.channel.send(`:lock: ${message.author}, this item is locked - you cannot buy it.`)
+        }
+
+        if (!await item.isEnoughMoneyFor(message.author.id, quantity)) {
+            return message.channel.send(
+                `${message.author}, you don't have enough coins to buy ` +
+                `x${quantity} \`${item.custom.emoji} ${item.name}\`.`
+            )
+        }
+
+        const buyingResult = await user.items.buy(item.id, quantity)
+
+        if (!buyingResult.status) {
+            return message.channel.send(`:x: ${message.author}, failed to buy the item: \`${buyingResult.message}\``)
+        }
+
+        message.channel.send(
+            `${message.author}, you bought x${buyingResult.quantity} ` +
+            `${item.custom.emoji} \`${item.name}\` for \`${buyingResult.totalPrice}\` coins.`
+        )
+    }
+    else if (command === 'use_item'){
+        const [itemID] = args
+        const item = inventory.find(item => item.id == parseInt(itemID) || item.name == itemID)
+
+        if (!itemID) {
+            return message.channel.send(`${message.author}, please specify an item in your inventory.`)
+        }
+
+        if (!item || item?.custom?.hidden) {
+            return message.channel.send(`${message.author}, the item either cannot be found, or it has been hidden by an admin.`)
+        }
+
+        if (item.custom.locked) {
+            return message.channel.send(`:lock: ${message.author}, this item is locked - you cannot use it.`)
+        }
+
+        const resultMessage = await item.use(client)
+        message.channel.send(`Item ${item.id}: \`${resultMessage}\``)
+    }
+    else if (command === 'sell'){
+        const [itemID, quantityString] = args
+        const quantity = parseInt(quantityString) || 1
+
+        const item = inventory.find(item => item.id == parseInt(itemID) || item.name == itemID)
+
+        if (!itemID) {
+            return message.channel.send(`${message.author}, please specify an item in your inventory.`)
+        }
+
+        if (!item) {
+            return message.channel.send(`${message.author}, item not found in your inventory.`)
+        }
+
+        if (item.custom.locked) {
+            return message.channel.send(`:lock: ${message.author}, this item is locked - you cannot sell it.`)
+        }
+
+        const sellingResult = await user.items.sell(item.id, quantity)
+
+        if (!sellingResult.status) {
+            return message.channel.send(`:x: ${message.author}, failed to sell the item: \`${sellingResult.message}\``)
+        }
+
+        message.channel.send(
+            `${message.author}, you sold x${sellingResult.quantity} ` +
+            `${item.custom.emoji} \`${item.name}\` for \`${sellingResult.totalPrice}\` coins.`
+        )
     }
 })
 client.login(process.env.BOT_USER_TOKEN)
