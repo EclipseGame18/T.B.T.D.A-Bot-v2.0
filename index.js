@@ -722,15 +722,23 @@ if (message.mentions.has(client.user.id)) {
             getUser(userID) || message.author
 
 
-        const economyUser = member ? argumentUser : user
-        const balanceData = await eco.cache.balance.get({ memberID: member.id, guildID: message.guild.id })
+        //const economyUser = member ? argumentUser : user
+        //const balanceData = await eco.cache.balance.get({ memberID: member.id, guildID: message.guild.id })
 
-        const [balance, bank] = [balanceData?.money, balanceData?.bank]
+        //const [balance, bank] = [balanceData?.money, balanceData?.bank]
+
+        const userBalanceGet = eco.cache.users.get({
+            memberID: member.id,
+            guildID: message.guild.id
+        })
+
+        const userBalance = await userBalanceGet.balance.get()
+        const userBankBalance = await userBalanceGet.bank.get()
 
         message.channel.send(
-            `${getUser(economyUser.id) || message.author}'s balance:\n` +
-            `Coins: **${balance || 0}**.\n` +
-            `Coins in bank: **${bank || 0}**.`
+            `${member}'s balance:\n` +
+            `Coins in wallet: **${userBalance || 0}**.\n` +
+            `Coins in bank: **${userBankBalance || 0}**.`
         )
     }
 
@@ -1126,9 +1134,13 @@ if (message.mentions.has(client.user.id)) {
         const userBalance = await user.balance.get()
         const amount = amountString == 'all' ? userBalance : parseInt(amountString)
 
+        if (isNaN(amountString)){
+            if(amountString == 'all'){
+        
+
         if (userBalance < amount || !userBalance) {
             return message.channel.send(
-                `:x: ${message.author}, you don't have enough coins to perform this deposit.\nYou have: \`${userBalance}\` coins.\nYou specified \`${amount}\` coins.`
+                `:x: ${message.author}, you don't have enough coins in your wallet to perform this deposit.\nYou have: \`${userBalance}\` coins.\nYou specified \`${amount}\` coins.`
             )
         }
 
@@ -1138,12 +1150,18 @@ if (message.mentions.has(client.user.id)) {
         message.channel.send(
             `${message.author}, you depositted **${amount}** coins into your bank.`
         )
+    } else{
+        return message.channel.send(`${message.author}, invalid input, either specify amount using numbers or enter 'all' to deposit all your coins.`)
+    }}
     }
     else if (command === 'withdraw'){
         const [amountString] = args
 
         const userBankBalance = await user.bank.get()
         const amount = amountString == 'all' ? userBankBalance : parseInt(amountString)
+
+        if (isNaN(amountString)){
+            if(amountString == 'all'){
 
         if (userBankBalance < amount || !userBankBalance) {
             return message.channel.send(
@@ -1157,6 +1175,9 @@ if (message.mentions.has(client.user.id)) {
         message.channel.send(
             `${message.author}, you withdrew **${amount}** coins from your bank.`
         )
+    } else{
+        return message.channel.send(`${message.author}, invalid input, either specify amount using numbers or enter 'all' to withdraw all your coins.`)
+    }}
     }
     else if (command === 'lb'){
         const rawLeaderboard = await guild.leaderboards.money()
