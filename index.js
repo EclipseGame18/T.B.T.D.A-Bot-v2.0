@@ -6,6 +6,13 @@ const wokcommands = require('wokcommands');
 
 const Economy = require('discord-economy-super/mongodb')
 
+const {CommandCooldown, msToMinutes} = require('discord-command-cooldown');
+
+const ms = require('ms')
+
+const stealCooldown = new CommandCooldown('steal', ms('10m'))
+const begCooldown = new CommandCooldown('beg', ms('5m'))
+
 const path = require('path');
 require("dotenv/config");
 
@@ -999,9 +1006,16 @@ if (message.mentions.has(client.user.id)) {
         )
     }
     else if (command === 'steal'){
+        const underCooldown = await stealCooldown.getUser(message.author.id)
+        if(underCooldown){
+            const time = msToMinutes(underCooldown.msLeft, false)
+            return message.channel.send(
+                `${message.author}, you can steal again in **${time.minutes}** minutes, **${time.seconds}** seconds.`
+            )
+        }
         const [userID] = args
         const user = message.mentions.users.first() || getUser(userID)
-        function generateRandom(min = -15, max = 30) {
+        function generateRandom(min = -15, max = 60) {
 
             // find diff
             let difference = max - min;
@@ -1030,13 +1044,15 @@ if (message.mentions.has(client.user.id)) {
         const userBalance = await argumentUser.balance.get() || 0
         const amount = generateRandom()
 
-        if(userBalance < 30){
+        if(userBalance < 60){
+            await stealCooldown.addUser(message.author.id)
             return message.channel.send(
                 `${message.author}, that user is too poor to steal form, try stealing form someone richer.`
             )
         }
 
         if(amount < 0){
+            await stealCooldown.addUser(message.author.id)
             const newAugment = eco.cache.users.get({
                 memberID: message.author.id,
                 guildID: message.guild.id
@@ -1056,7 +1072,53 @@ if (message.mentions.has(client.user.id)) {
         message.channel.send(
             `${message.author}, you successfully stole \`${amount}\` coins!`
         )
+        await stealCooldown.addUser(message.author.id)
+    }
+    else if (command === 'beg'){
+        const underCooldown = await begCooldown.getUser(message.author.id)
+        if(underCooldown){
+            const time = msToMinutes(underCooldown.msLeft, false)
+            return message.channel.send(
+                `${message.author}, you can beg again in **${time.minutes}** minutes, **${time.seconds}** seconds.`
+            )
+        }
+        const nameList = [
+            'Bill', 'Tegan', 'Peter', 'Margerate', 'Bob', 'Amanda', 'Noah', 'Jerry', 'Jan-Luke', 'Anikin', 'Sophie', 'Jack', 'Daniel', 'Malinda', 'Craig'
+        ]
+        function generateName() {
+            var finalName = nameList[Math.floor(Math.random() * nameList.length)];
+                  return finalName
+                };
+        function generateRandom(min = -30, max = 100) {
 
+            // find diff
+            let difference = max - min;
+        
+            // generate random number 
+            let rand = Math.random();
+        
+            // multiply with difference 
+            rand = Math.floor( rand * difference);
+        
+            // add with min value 
+            rand = rand + min;
+        
+            return rand;
+        }
+        const amount = generateRandom()
+        if(amount < 0){
+            await begCooldown.addUser(message.author.id)
+            return message.channel.send(
+                `${message.author}, you beged for a while and everyone ignored you. You have reveved no coins, nor have you lost any.`
+            )
+            }
+        const newAugmentSuccess = eco.cache.users.get({
+            memberID: message.author.id,
+            guildID: message.guild.id
+        })
+        await newAugmentSuccess.balance.add(amount)
+        message.channel.send(`${message.author}, **${generateName()}** has given you ${amount} coins.`)
+        await begCooldown.addUser(message.author.id)
     }
     else if (command === 'dep'){
         const [amountString] = args
