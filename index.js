@@ -1117,7 +1117,7 @@ if (message.mentions.has(client.user.id)) {
             guildID: message.guild.id
         })
         await newAugmentSuccess.balance.add(amount)
-        message.channel.send(`${message.author}, **${generateName()}** has given you ${amount} coins.`)
+        message.channel.send(`${message.author}, **${generateName()}** has given you \`${amount}\` coins.`)
         await begCooldown.addUser(message.author.id)
     }
     else if (command === 'dep'){
