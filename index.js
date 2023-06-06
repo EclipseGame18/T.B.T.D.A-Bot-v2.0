@@ -1160,7 +1160,7 @@ if (message.mentions.has(client.user.id)) {
             `Description: \`${item.description}\`\n` +
             `Max quantity in inventory: \`${item.maxAmount}\`\n\n` +
 
-            `${item.role ? `Role: **<@&${item.role}>**\n` : ''}` +
+            `${item.role ? `Role granted on use: ${item.role}\n` : ''}` +
             `Hidden: \`${item.custom.hidden ? 'Yes' : 'No'}\`\n` +
             `Locked: \`${item.custom.locked ? 'Yes' : 'No'}\`\n\n` +
 
@@ -1169,10 +1169,10 @@ if (message.mentions.has(client.user.id)) {
         )
     }
     else if (command === 'add_shop_item'){
-        const [name, emoji, priceString, description, maxAmount] = args
+        const [name, emoji, priceString, description, maxAmount, role] = args
 
         if(args[0] === 'syntax'){
-            return message.channel.send(`Syntax for \`!add_shop_item\` command:\n\`!add_shop_item\` \`{name}\` \`{emoji}\` \`{price}\` \`{description_seperated_by_underscores}\` \`{max amount allowed in inventory [optional]}\` \`{message on use NO UNDERSCORES [optional]}\``)
+            return message.channel.send(`Syntax for \`!add_shop_item\` command:\n\`!add_shop_item\` \`{name}\` \`{emoji}\` \`{price}\` \`{description_seperated_by_underscores}\` \`{max amount allowed in inventory [optional]}\` \`{role to add to player on use [optional]}\` \`{message on use NO UNDERSCORES}\``)
         }
 
         const price = parseInt(priceString)
@@ -1188,18 +1188,18 @@ if (message.mentions.has(client.user.id)) {
         // "wonderful", "great" or "sunny".
 
         if (!name) {
-            return message.channel.send(`${message.author}, please provide a name for the item.\n*!add_shop_item {name} {emoji} {price} {description_seperated_by_underscores} {max amount allowed in inventory [optional]} {message on use NO UNDERSCORES [optional]}*`)
+            return message.channel.send(`${message.author}, please provide a name for the item.\n*!add_shop_item {name} {emoji} {price} {description_seperated_by_underscores} {max amount allowed in inventory [optional]} {role to add to player on use [optional]} {message on use NO UNDERSCORES}*`)
         }
 
         if (!emoji) {
-            return message.channel.send(`${message.author}, please provide an emoji for the item.\n*!add_shop_item {name} {emoji} {price} {description_seperated_by_underscores} {max amount allowed in inventory [optional]} {message on use NO UNDERSCORES [optional]}*`)
+            return message.channel.send(`${message.author}, please provide an emoji for the item.\n*!add_shop_item {name} {emoji} {price} {description_seperated_by_underscores} {max amount allowed in inventory [optional]} {role to add to player on use [optional]} {message on use NO UNDERSCORES}*`)
         }
 
         if (!price) {
-            return message.channel.send(`${message.author}, please provide a price for the item.\n*!add_shop_item {name} {emoji} {price} {description_seperated_by_underscores} {max amount allowed in inventory [optional]} {message on use NO UNDERSCORES [optional]}*`)
+            return message.channel.send(`${message.author}, please provide a price for the item.\n*!add_shop_item {name} {emoji} {price} {description_seperated_by_underscores} {max amount allowed in inventory [optional]} {role to add to player on use [optional]} {message on use NO UNDERSCORES}*`)
         }
         if (!description){
-            return message.channel.send(`${message.author}, please provide a description for the item.\n*!add_shop_item {name} {emoji} {price} {description_seperated_by_underscores} {max amount allowed in inventory [optional]} {message on use NO UNDERSCORES [optional]}*`)
+            return message.channel.send(`${message.author}, please provide a description for the item.\n*!add_shop_item {name} {emoji} {price} {description_seperated_by_underscores} {max amount allowed in inventory [optional]} {role to add to player on use [optional]} {message on use NO UNDERSCORES}*`)
         }
         if (maxAmount){
             if(isNaN(maxAmount)){
@@ -1213,6 +1213,7 @@ if (message.mentions.has(client.user.id)) {
             description,
             maxAmount,
             message: messageOnUse || '',
+            role,
 
             custom: {
                 emoji,
@@ -1481,7 +1482,7 @@ if (message.mentions.has(client.user.id)) {
             })
 
         message.channel.send(
-            `${message.author}, here's your inventory [\`${userInventory.length} items\`]:\n\n` +
+            `${message.author}, here's your inventory \`${userInventory.length} items\`:\n\n` +
             cleanInventory
                 .map(
                     (data, index) =>
@@ -1597,7 +1598,7 @@ if (message.mentions.has(client.user.id)) {
         }
 
         const resultMessage = await item.use(client)
-        message.channel.send(`Item ${item.id}: \`${resultMessage}\``)
+        message.channel.send(`**Item ${item.id}**: ${resultMessage}`)
     }
     else if (command === 'sell'){
         const [itemID, quantityString] = args
