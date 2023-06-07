@@ -12,6 +12,7 @@ const ms = require('ms')
 
 const stealCooldown = new CommandCooldown('steal', ms('10m'))
 const begCooldown = new CommandCooldown('beg', ms('5m'))
+const depCooldown = new CommandCooldown('dep', ms('10s'))
 
 const path = require('path');
 require("dotenv/config");
@@ -57,11 +58,11 @@ let eco = new Economy({
             useUnifiedTopology: true,
         } // specify if using MongoDB version (optional)
     },
-    dailyAmount: 100,
+    dailyAmount: 150,
     workAmount: [15, 75],
-    weeklyAmount: [100, 150],
-    monthlyAmount: [200, 300],
-    hourlyAmount: 10,
+    weeklyAmount: [250, 350],
+    monthlyAmount: [400, 500],
+    hourlyAmount: 85,
     dailyCooldown: 86400000,
     workCooldown: 14400000,
     weeklyCooldown: 604800000,
@@ -714,7 +715,7 @@ if (message.mentions.has(client.user.id)) {
         }
         
     }
-    else if(command === 'bal'){
+    else if(command === 'bal' || command === 'balance'){
         const [userID] = args
 
         const member =
@@ -1023,7 +1024,7 @@ if (message.mentions.has(client.user.id)) {
         }
         const [userID] = args
         const user = message.mentions.users.first() || getUser(userID)
-        function generateRandom(min = -15, max = 60) {
+        function generateRandom(min = -25, max = 150) {
 
             // find diff
             let difference = max - min;
@@ -1052,10 +1053,16 @@ if (message.mentions.has(client.user.id)) {
         const userBalance = await argumentUser.balance.get() || 0
         const amount = generateRandom()
 
-        if(userBalance < 60){
+        if(userBalance < 20){
             await stealCooldown.addUser(message.author.id)
             return message.channel.send(
                 `${message.author}, that user is too poor to steal form, try stealing form someone richer.`
+            )
+        }
+
+        if(userBalance < amount){
+            return message.channel.send(
+                `${message.author}, you attempted to steal ${amount} coins form ${user.username}. However, ${user.username} does not have ${amount} coins. You apologyze and walk off.`
             )
         }
 
@@ -1091,7 +1098,7 @@ if (message.mentions.has(client.user.id)) {
             )
         }
         const nameList = [
-            'Bill', 'Tegan', 'Peter', 'Margerate', 'Bob', 'Amanda', 'Noah', 'Jerry', 'Jan-Luke', 'Anikin', 'Sophie', 'Jack', 'Daniel', 'Malinda', 'Craig'
+            'Bill', 'Tegan', 'Peter', 'Margerate', 'Bob', 'Amanda', 'Noah', 'Jerry', 'Picard', 'Anikin', 'Sophie', 'Jack', 'Daniel', 'Malinda', 'Craig', 'Megan', 'James', 'Fred'
         ]
         function generateName() {
             var finalName = nameList[Math.floor(Math.random() * nameList.length)];
@@ -1128,7 +1135,14 @@ if (message.mentions.has(client.user.id)) {
         message.channel.send(`${message.author}, **${generateName()}** has given you \`${amount}\` coins.`)
         await begCooldown.addUser(message.author.id)
     }
-    else if (command === 'dep'){
+    else if (command === 'dep' || command === 'deposit'){
+        const underCooldown = await depCooldown.getUser(message.author.id)
+        if(underCooldown){
+            const time = msToMinutes(underCooldown.msLeft, false)
+            return message.channel.send(
+                `${message.author}, you can deposit coins in **${time.seconds}** seconds.`
+            )
+        }
         const [amountString] = args
 
         const userBalance = await user.balance.get()
@@ -1146,13 +1160,26 @@ if (message.mentions.has(client.user.id)) {
 
         await user.balance.subtract(amount, `depositted ${amount} coins`)
         await user.bank.add(amount, `depositted ${amount} coins`)
-
+        await depCooldown.addUser(message.author.id)
         message.channel.send(
             `${message.author}, you depositted **${amount}** coins into your bank.`
         )
     } else{
         return message.channel.send(`${message.author}, invalid input, either specify amount using numbers or enter 'all' to deposit all your coins.`)
-    }}
+    }} else {
+        if (userBalance < amount || !userBalance) {
+            return message.channel.send(
+                `:x: ${message.author}, you don't have enough coins in your wallet to perform this deposit.\nYou have: \`${userBalance}\` coins.\nYou specified \`${amount}\` coins.`
+            )
+        }
+
+        await user.balance.subtract(amount, `depositted ${amount} coins`)
+        await user.bank.add(amount, `depositted ${amount} coins`)
+        await depCooldown.addUser(message.author.id)
+        message.channel.send(
+            `${message.author}, you depositted **${amount}** coins into your bank.`
+        )
+    }
     }
     else if (command === 'withdraw'){
         const [amountString] = args
@@ -1177,9 +1204,22 @@ if (message.mentions.has(client.user.id)) {
         )
     } else{
         return message.channel.send(`${message.author}, invalid input, either specify amount using numbers or enter 'all' to withdraw all your coins.`)
-    }}
+    }} else{
+        if (userBankBalance < amount || !userBankBalance) {
+            return message.channel.send(
+                `${message.author}, you don't have enough coins in your bank to perform this withdraw.\nYou have: \`${userBankBalance}\`\nYou specified: \`${amount}\``
+            )
+        }
+
+        await user.balance.add(amount, `withdrew ${amount} coins`)
+        await user.bank.subtract(amount, `withdrew ${amount} coins`)
+
+        message.channel.send(
+            `${message.author}, you withdrew **${amount}** coins from your bank.`
+        )
     }
-    else if (command === 'lb'){
+    }
+    else if (command === 'lb' || command === 'rich' || command === "leader_board"){
         const rawLeaderboard = await guild.leaderboards.money()
 
         const leaderboard = rawLeaderboard
@@ -1545,7 +1585,7 @@ if (message.mentions.has(client.user.id)) {
             return message.channel.send(`${message.author}, please type \`confirm\` if you wish to clear the entire guild shop. This cannot be undone.`)
         }
     }
-    else if (command === 'inv'){
+    else if (command === 'inv' || command === 'inventory'){
         const userInventory = inventory.filter(item => !item.custom.hidden)
 
         if (!userInventory.length) {
@@ -1576,7 +1616,7 @@ if (message.mentions.has(client.user.id)) {
                 .join('\n')
         )
     }
-    else if (command === 'clear_inv'){
+    else if (command === 'clear_inv' || command === 'clear_inventory'){
         if(args[0] === 'confirm'){
         if (!inventory.length) {
             return message.channel.send(`${message.author}, you don't have any items in your inventory.`)
@@ -1664,7 +1704,7 @@ if (message.mentions.has(client.user.id)) {
             `${item.custom.emoji} \`${item.name}\` for \`${buyingResult.totalPrice}\` coins.`
         )
     }
-    else if (command === 'use_item'){
+    else if (command === 'use_item' || command === 'use'){
         const [itemID] = args
         const item = inventory.find(item => item.id == parseInt(itemID) || item.name == itemID)
 
