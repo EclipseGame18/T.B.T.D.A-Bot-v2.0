@@ -1292,14 +1292,14 @@ if (message.mentions.has(client.user.id)) {
         )
     }
     else if (command === 'add_shop_item'){
-        const [name, emoji, priceString, description, maxAmount, role] = args
+        let [name, emoji, priceString, description, maxAmount, role] = args
 
         if(args[0] === 'syntax'){
-            return message.channel.send(`Syntax for \`!add_shop_item\` command:\n\`!add_shop_item\` \`{name}\` \`{emoji}\` \`{price}\` \`{description_seperated_by_underscores}\` \`{max amount allowed in inventory [optional]}\` \`{role to add to player on use [optional]}\` \`{message on use NO UNDERSCORES}\``)
+            return message.channel.send(`Syntax for \`!add_shop_item\` command:\n\`!add_shop_item\` \`{name}\` \`{emoji}\` \`{price}\` \`{description_seperated_by_underscores}\` \`{max amount allowed in inventory}\` \`{role to add to player on use [enter null if no role]}\` \`{message on use NO UNDERSCORES}\``)
         }
 
         const price = parseInt(priceString)
-        const messageOnUse = args.slice(5).join(' ')
+        const messageOnUse = args.slice(6).join(' ')
 
         // message on use is optional and defaults to `You have used this item!`
 
@@ -1311,23 +1311,30 @@ if (message.mentions.has(client.user.id)) {
         // "wonderful", "great" or "sunny".
 
         if (!name) {
-            return message.channel.send(`${message.author}, please provide a name for the item.\n*!add_shop_item {name} {emoji} {price} {description_seperated_by_underscores} {max amount allowed in inventory [optional]} {role to add to player on use [optional]} {message on use NO UNDERSCORES}*`)
+            return message.channel.send(`${message.author}, please provide a name for the item.\n*!add_shop_item {name} {emoji} {price} {description_seperated_by_underscores} {max amount allowed in inventory} {role to add to player on use [enter null if no role]} {message on use NO UNDERSCORES}*`)
         }
 
         if (!emoji) {
-            return message.channel.send(`${message.author}, please provide an emoji for the item.\n*!add_shop_item {name} {emoji} {price} {description_seperated_by_underscores} {max amount allowed in inventory [optional]} {role to add to player on use [optional]} {message on use NO UNDERSCORES}*`)
+            return message.channel.send(`${message.author}, please provide an emoji for the item.\n*!add_shop_item {name} {emoji} {price} {description_seperated_by_underscores} {max amount allowed in inventory} {role to add to player on use [enter null if no role]} {message on use NO UNDERSCORES}*`)
         }
 
         if (!price) {
-            return message.channel.send(`${message.author}, please provide a price for the item.\n*!add_shop_item {name} {emoji} {price} {description_seperated_by_underscores} {max amount allowed in inventory [optional]} {role to add to player on use [optional]} {message on use NO UNDERSCORES}*`)
+            return message.channel.send(`${message.author}, please provide a price for the item.\n*!add_shop_item {name} {emoji} {price} {description_seperated_by_underscores} {max amount allowed in inventory} {role to add to player on use [enter null if no role]} {message on use NO UNDERSCORES}*`)
         }
         if (!description){
-            return message.channel.send(`${message.author}, please provide a description for the item.\n*!add_shop_item {name} {emoji} {price} {description_seperated_by_underscores} {max amount allowed in inventory [optional]} {role to add to player on use [optional]} {message on use NO UNDERSCORES}*`)
+            return message.channel.send(`${message.author}, please provide a description for the item.\n*!add_shop_item {name} {emoji} {price} {description_seperated_by_underscores} {max amount allowed in inventory} {role to add to player on use [enter null if no role]} {message on use NO UNDERSCORES}*`)
         }
-        if (maxAmount){
-            if(isNaN(maxAmount)){
+        if (!maxAmount){
+            return message.channel.send(`${message.author}, please provide a maxmum amount allowed in inventory for the item.\n*!add_shop_item {name} {emoji} {price} {description_seperated_by_underscores} {max amount allowed in inventory} {role to add to player on use [enter null if no role]} {message on use NO UNDERSCORES}*`)
+        }
+        if(isNaN(maxAmount)){
                 return message.channel.send(`${message.author}, your maxmum amount allowed in inventory specification must be a number.`)
             }
+        if(role !== 'null' && !message.member.permissions.has(PermissionsBitField.Flags.ManageRoles)){
+            return message.reply(`:x: Unable to comply, you require \`Manage_Roles\` permision to specify a role to add. Input \`null\` to ignore role`)
+        }
+        if(role === 'null'){
+            role = ''
         }
 
         const newItem = await guild.shop.addItem({
@@ -1335,7 +1342,7 @@ if (message.mentions.has(client.user.id)) {
             price,
             description,
             maxAmount,
-            message: messageOnUse || '',
+            message: messageOnUse || '{error: no_message_entered}',
             role,
 
             custom: {
@@ -1582,7 +1589,7 @@ if (message.mentions.has(client.user.id)) {
         )
         }
         else{
-            return message.channel.send(`${message.author}, please type \`confirm\` if you wish to clear the entire guild shop. This cannot be undone.`)
+            return message.channel.send(`${message.author}, please type \`confirm\` if you wish to clear the entire guild shop. This cannot be undone.\n*!clear_shop confirm*`)
         }
     }
     else if (command === 'inv' || command === 'inventory'){
@@ -1629,20 +1636,19 @@ if (message.mentions.has(client.user.id)) {
         )
         }
         else{
-            message.channel.send(`${message.author}, please type \`confirm\` if you wish to clear your entire inventory. This cannot be undone.`)
+            message.channel.send(`${message.author}, please type \`confirm\` if you wish to clear your entire inventory. This cannot be undone.\n*!clear_inv confirm*`)
         }
     }
     else if (command === 'history'){
-        const userHistory = history.filter(item => !item.custom.hidden)
-
-        if (!userHistory.length) {
+        //const userHistory = history.filter(item => !item.custom.hidden) [old way, uses cache. cache is broken.]
+        const userHistory = user.history.get() // new way, gets directaly from data base.
+        if (!(await userHistory).length) {
             return message.channel.send(`${message.author}, you don't have any items in your purchases history.`)
         }
 
         message.channel.send(
-            `${message.author}, here's your purchase history [**${userHistory.length} items**]:\n\n` +
-            userHistory
-                .map(
+            `${message.author}, here's your purchase history [**${(await userHistory).length} items**]:\n\n` +
+            (await userHistory).map(
                     item => `x${item.quantity} ${item.custom.emoji} **${item.name}** - ` +
                         `\`${item.price}\` coins. Purchased: \`${item.date}\``
                 )
@@ -1651,18 +1657,19 @@ if (message.mentions.has(client.user.id)) {
     }
     else if (command === 'clear_history'){
         if(args[0] === 'confirm'){
-        if (!history.length) {
+            const userHistory = user.history.get()
+        if (!(await userHistory).length) {
             return message.channel.send(`${message.author}, you don't have any items in your purchases history.`)
         }
 
         await user.history.clear()
 
         message.channel.send(
-            `${message.author}, cleared **${history.length}** items from your purchases history.`
+            `${message.author}, cleared **${(await userHistory).length}** items from your purchases history.`
         )
         }
         else{
-            message.channel.send(`${message.author}, please type \`confirm\` if you wish to clear your entire purchase history. This cannot be undone.`)
+            message.channel.send(`${message.author}, please type \`confirm\` if you wish to clear your entire purchase history. This cannot be undone.\n*!clear_history confirm*`)
         }
     }
     else if (command === 'buy'){
