@@ -12,7 +12,7 @@ const ms = require('ms')
 
 const stealCooldown = new CommandCooldown('steal', ms('10m'))
 const begCooldown = new CommandCooldown('beg', ms('5m'))
-const depCooldown = new CommandCooldown('dep', ms('10s'))
+const depCooldown = new CommandCooldown('dep', ms('60s'))
 
 const path = require('path');
 require("dotenv/config");
@@ -1147,6 +1147,14 @@ if (message.mentions.has(client.user.id)) {
 
         const userBalance = await user.balance.get()
         const amount = amountString == 'all' ? userBalance : parseInt(amountString)
+
+        const bankCheck = await user.bank.get()
+        if(bankCheck === 4500){
+            return message.channel.send(`${message.author}, you have reached the bank limit of 4500 coins. You can no longer add any more coins.`)
+        }
+        if(bankCheck + amount > 4500){
+            return message.channel.send(`${message.author}, You are trying to add \`${amount}\` coins into your bank, but you already have \`${bankCheck}\` coins in your bank.\nThe max amount allowed in you bank is 4500 coins, this total amount would be \`${bankCheck + amount}\` coins, this is \`${bankCheck + amount - 4500}\` coins too many.`)
+        }
 
         if (isNaN(amountString)){
             if(amountString == 'all'){
