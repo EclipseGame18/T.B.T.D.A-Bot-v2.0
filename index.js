@@ -1150,10 +1150,10 @@ if (message.mentions.has(client.user.id)) {
 
         const bankCheck = await user.bank.get()
         if(bankCheck === 4500){
-            return message.channel.send(`${message.author}, you have reached the bank limit of 4500 coins. You can no longer add any more coins.`)
+            return message.channel.send(`${message.author}, you have reached the bank limit of **4500** coins. You can no longer add any more coins.`)
         }
         if(bankCheck + amount > 4500){
-            return message.channel.send(`${message.author}, You are trying to add \`${amount}\` coins into your bank, but you already have \`${bankCheck}\` coins in your bank.\nThe max amount allowed in your bank is 4500 coins, this total amount would be \`${bankCheck + amount}\` coins, this is \`${bankCheck + amount - 4500}\` coins too many.`)
+            return message.channel.send(`${message.author}, You are trying to add \`${amount}\` coins into your bank, but you already have \`${bankCheck}\` coins in your bank.\nThe max amount allowed in your bank is **4500** coins, this total amount would be \`${bankCheck + amount}\` coins, this is \`${bankCheck + amount - 4500}\` coins too many.`)
         }
 
         if (isNaN(amountString)){
