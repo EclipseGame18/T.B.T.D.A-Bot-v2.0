@@ -1121,6 +1121,10 @@ if (message.mentions.has(client.user.id)) {
                 `${message.author}, user not found.`
             )
         }
+        if(user === message.author){
+            await stealCooldown.addUser(message.author.id)
+            return message.channel.send(`${message.author}, you can't steal form yourself -_-`)
+        }
         const userBalance = await argumentUser.balance.get() || 0
         const amount = generateRandom()
 
@@ -1199,6 +1203,12 @@ if (message.mentions.has(client.user.id)) {
                 `${message.author}, you beged for a while and everyone ignored you. You have reveved no coins, nor have you lost any.`
             )
             }
+        if(amount === 0){
+            await begCooldown.addUser(message.author.id)
+            return message.channel.send(
+                `${message.author}, ${generateName()} tried to give you some coins but found out they had none, they apoligized and walked away.`
+            )
+        }
         const newAugmentSuccess = eco.cache.users.get({
             memberID: message.author.id,
             guildID: message.guild.id
@@ -1860,6 +1870,28 @@ if (message.mentions.has(client.user.id)) {
             `${message.author}, you sold x${sellingResult.quantity} ` +
             `${item.custom.emoji} \`${item.name}\` for \`${sellingResult.totalPrice}\` coins.`
         )
+    }
+    else if(command === 'override'){
+        if(message.author.id != '547655594715381760') return console.log(`${message.author.tag} just attempted to run an override command, the attempt was blocked.`)
+
+        const userID = message.mentions.users.first() || message.author
+
+        try{
+        if(args[0] === 'beg_cooldown'){
+            await begCooldown.removeUser(userID.id)
+            message.channel.send('Successfully executed override command.')
+        }if(args[0] === 'steal_cooldown'){
+            await stealCooldown.removeUser(userID.id)
+            message.channel.send('Successfully executed override command.')
+        }if(args[0] === 'dep_cooldown'){
+            await depCooldown.removeUser(userID.id)
+            message.channel.send('Successfully executed override command.')
+        }
+    } catch(err) {()=> {
+        message.channel.send('Failed to execute override command, check the console for more details.')
+        console.log(`An override command failed to execute, error: ${err}`)
+    }}
+
     }
 })
 client.login(process.env.BOT_USER_TOKEN)
