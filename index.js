@@ -1,6 +1,8 @@
 const { Client, Events, GatewayIntentBits, Partials, messageLink, Message, EmbedBuilder, ActivityType, PermissionsBitField } = require ('discord.js');
 
-const { VoiceConnection, VoiceConnectionStatus, joinVoiceChannel } = require('@discordjs/voice');
+const {AudioPlayer, createAudioResource, StreamType, entersState, VoiceConnectionStatus, joinVoiceChannel, getVoiceConnection} = require('@discordjs/voice');
+
+const discordTTS = require("discord-tts");
 
 const wokcommands = require('wokcommands');
 
@@ -47,7 +49,12 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds,
                                       GatewayIntentBits.GuildModeration,
                                       GatewayIntentBits.DirectMessages
                                      ],
-                                     partials: [Partials.Channel],
+                                     partials: [
+                                        Partials.Channel,
+                                        Partials.User,
+                                        Partials.Message,
+                                        Partials.GuildMember,
+                                    ],
                         });
 
 
@@ -204,6 +211,9 @@ eco.on('ready', economy => {
     eco = economy
   })
 
+let voiceConnection;
+let audioPlayer = new AudioPlayer();
+
 client.on('guildMemberAdd', async(member) =>{
     await member.guild.fetch();
 
@@ -345,6 +355,11 @@ client.on("guildCreate", async (guild) => {
 
 const getUser = userID => client.users.cache.get(userID)
 
+let stream
+let ttsChannel
+let tts_text
+let ttsOn = false
+
 client.on('messageCreate', async (message) => {
     if(message.author.bot) return;
 
@@ -376,6 +391,14 @@ client.on('messageCreate', async (message) => {
                 upsert: true
             })
       }
+      
+      if(tts_text === null || !tts_text){
+        tts_text = 'TTS encountered and error'
+      }
+      if(message.channel.id === ttsChannel && ttsOn === true){
+        tts_text = (`${message.author.username} said: ${message.content}`)
+        tts(message)
+   }
 
 
       let ecoStatus = toggleEco.toggle;
@@ -1893,6 +1916,54 @@ if (message.mentions.has(client.user.id)) {
     }}
 
     }
+    else if(command === 'tts' || command === 'begin_tts'){
+        ttsChannel = message.channel.id
+        tts_text = "Text to speach is ready, TTS will use the channel the command was ran in as the input channel."
+        ttsOn = true
+        message.channel.send(`TTS is now actave, TTS commands and input are locked to ${message.channel}. User message rate of 5 seconds is actave.`)
+        message.channel.setRateLimitPerUser(5)
+        tts(message)
+    }
+    else if(command === 'tts_off' || command === 'stop_tts'){
+        if(ttsOn === false) return message.channel.send(':x: TTS is alreay off, use `!leave` to disconnect the bot form a channel')
+        let ttsChannelname = message.guild.channels.cache.get(ttsChannel)
+        if(message.channel.id !== ttsChannel) return message.channel.send(`:x: You must run this command in the current TTS channel, ${ttsChannelname}`)
+        ttsOn = false
+        ttsChannel = null
+        const connection = getVoiceConnection(message.guild.id);
+        if (connection) {
+          // Disconnect from the voice channel
+          connection.destroy();
+          voiceConnection = null
+          message.channel.setRateLimitPerUser(0)
+          //console.log(`Disconnected from ${connection.joinConfig.channel.name} voice channel!`);
+           message.channel.send(`TTS and channel message rate is off and I have left the voice channel! :wave:`);
+        } else {
+           message.channel.send(':x: Unable to comply, I am not currently connected to a voice channel.');
+        }
+    }
 })
+
+async function tts(message){
+    if(tts_text.length > 200){
+        tts_text = 'Error, text overload, please limit TTS messages to 200 characters or less'
+        message.channel.send(`${message.author}, please limit TTS messages to 200 characters or less.`)
+    }
+    stream = discordTTS.getVoiceStream(tts_text);
+    const audioResource=createAudioResource(stream, {inputType: StreamType.Arbitrary, inlineVolume:true});
+        if(!voiceConnection || voiceConnection.status===VoiceConnectionStatus.Disconnected || voiceConnection.status===VoiceConnectionStatus.Destroyed){
+            voiceConnection = joinVoiceChannel({
+                channelId: message.member.voice.channel.id,
+                guildId: message.guild.id,
+                adapterCreator: message.guild.voiceAdapterCreator,
+            });
+            voiceConnection=await entersState(voiceConnection, VoiceConnectionStatus.Connecting, 5_000);
+        }
+        
+        if(voiceConnection.status===VoiceConnectionStatus.Connected){
+            voiceConnection.subscribe(audioPlayer);
+            audioPlayer.play(audioResource);
+        }
+}
 client.login(process.env.BOT_USER_TOKEN)
  //4.10.0

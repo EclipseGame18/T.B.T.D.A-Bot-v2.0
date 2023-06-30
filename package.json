@@ -20,6 +20,7 @@
     "discord-command-cooldown": "^1.0.9",
     "discord-economy-super": "^1.7.6",
     "discord-music-player": "^9.1.1",
+    "discord-tts": "^1.2.2",
     "discord-ytdl-core": "^5.0.4",
     "discord.js": "^14.9.0",
     "domhandler": "^5.0.3",
