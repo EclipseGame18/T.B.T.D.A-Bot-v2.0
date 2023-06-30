@@ -397,6 +397,8 @@ client.on('messageCreate', async (message) => {
       }
       if(message.channel.id === ttsChannel && ttsOn === true){
         tts_text = (`${message.author.username} said: ${message.content}`)
+        if(message.content === '!tts_off' || message.content === '!stop_tts') return message.react('🔇')
+        message.react('🔊')
         tts(message)
    }
 
