@@ -1,6 +1,6 @@
 const { Client, Events, GatewayIntentBits, Partials, messageLink, Message, EmbedBuilder, ActivityType, PermissionsBitField } = require ('discord.js');
 
-const {AudioPlayer, createAudioResource, StreamType, entersState, VoiceConnectionStatus, joinVoiceChannel, getVoiceConnection} = require('@discordjs/voice');
+const {AudioPlayer, createAudioResource, StreamType, entersState, VoiceConnectionStatus, joinVoiceChannel, getVoiceConnection, AudioPlayerStatus} = require('@discordjs/voice');
 
 const discordTTS = require("discord-tts");
 
@@ -34,6 +34,10 @@ const GuildWelcomeChannel = require('./Guild4')
 const ToggleMusic = require(`./Guild5`)
 
 const ToggleEco = require(`./Guild6`)
+
+function print(log){
+    console.log(log)
+}
 
 const {
 	Mongoose, connection
@@ -359,9 +363,24 @@ let stream
 let ttsChannel
 let tts_text
 let ttsOn = false
+let ttsQueue = []
+let ttsPlayerStatus = false
+let ttsMessageRequirement
+let musicOn = false
+
+setInterval(function(){ 
+    //code goes here that will be run every 2 seconds.
+    if(ttsQueue.length && ttsPlayerStatus === 'idle' && ttsOn === true){
+        tts_text = (ttsQueue[0])
+        tts(ttsMessageRequirement)
+        ttsQueue.shift()
+    }   
+}, 2000);
+    
 
 client.on('messageCreate', async (message) => {
     if(message.author.bot) return;
+    ttsMessageRequirement = message
 
       const toggleMusic = await ToggleMusic.findOne({_id: message.guild.id}).catch(error => {
         console.log(`There was an error: ${error}`)
@@ -397,9 +416,22 @@ client.on('messageCreate', async (message) => {
       }
       if(message.channel.id === ttsChannel && ttsOn === true){
         tts_text = (`${message.author.username} said: ${message.content}`)
-        if(message.content === '!tts_off' || message.content === '!stop_tts') return message.react('🔇')
+        if(ttsPlayerStatus === 'playing'){
+            ttsQueue.push(tts_text)
+            message.react('📝')
+        } else{
+
+        if(message.content.startsWith('!')){
+            message.react('🔇')
+        }
+        else{
+
         message.react('🔊')
         tts(message)
+        
+    }
+    }
+    
    }
 
 
@@ -525,6 +557,7 @@ if (message.mentions.has(client.user.id)) {
         if (!message.member.voice.channel) {
             return message.reply(":x: Unable to comply, you need to be in a voice channel to use this command.");
           }
+          if(ttsPlayerStatus !== false) return message.reply('You must end TTS to begin music playback, use `!tts_off` to turn off TTS')
         message.channel.send(`Searching for: \`${args.join(' ')}\``)
         let queue = client.player.createQueue(message.guild.id, {
             data: {
@@ -533,6 +566,7 @@ if (message.mentions.has(client.user.id)) {
                 }
         });
         await queue.join(message.member.voice.channel);
+        musicOn = true
         let song = await queue.play(args.join(' ')).catch(err => {
             console.log(`A DMP error occured: ` + err);
             message.channel.send('Unable to continue playback, an unknown error occured. :shrug:')
@@ -546,6 +580,7 @@ if (message.mentions.has(client.user.id)) {
         if (!message.member.voice.channel) {
             return message.reply(":x: Unable to comply, you need to be in a voice channel to use this command.");
           }
+          if(ttsPlayerStatus !== false) return message.reply('You must end TTS to begin music playback, use `!tts_off` to turn off TTS')
         message.channel.send(`Searching for: \`${args.join(' ')}\``)
         let queue = client.player.createQueue(message.guild.id, {
             data: {
@@ -554,6 +589,7 @@ if (message.mentions.has(client.user.id)) {
                 }
         });
         await queue.join(message.member.voice.channel);
+        musicOn = true
         let song = await queue.playlist(args.join(' ')).catch(err => {
             console.log(`A DMP error occured: ` + err);
             message.channel.send('Unable to continue playback, an unknown error occured. :shrug:')
@@ -578,6 +614,7 @@ if (message.mentions.has(client.user.id)) {
     else if(command == 'stop'){
         try{
             guildQueue.stop()
+            musicOn = false
         }catch(err){
             return message.channel.send(':x: Unable to comply, the queue is currentaly empty.')
         }
@@ -1897,7 +1934,7 @@ if (message.mentions.has(client.user.id)) {
         )
     }
     else if(command === 'override'){
-        if(message.author.id != '547655594715381760') return console.log(`${message.author.tag} just attempted to run an override command, the attempt was blocked.`)
+        if(message.author.id !== '547655594715381760') return console.log(`${message.author.tag} form server: ${message.guild.name} just attempted to run an override command, the attempt was blocked.`)
 
         const userID = message.mentions.users.first() || message.author
 
@@ -1911,6 +1948,14 @@ if (message.mentions.has(client.user.id)) {
         }if(args[0] === 'dep_cooldown'){
             await depCooldown.removeUser(userID.id)
             message.channel.send('Successfully executed override command.')
+        }if(args[0] === 'clear_temp_settings'){
+            ttsChannel = null
+            tts_text = null
+            ttsOn = false
+            ttsQueue = []
+            ttsPlayerStatus = false
+            musicOn = false
+            message.channel.send('Successfully executed override command.')
         }
     } catch(err) {()=> {
         message.channel.send('Failed to execute override command, check the console for more details.')
@@ -1918,26 +1963,30 @@ if (message.mentions.has(client.user.id)) {
     }}
 
     }
-    else if(command === 'tts' || command === 'begin_tts'){
+    else if(command === 'tts'){
+        if(!message.member.voice.channel) return message.channel.send(`${message.author}, you myst be in a voice channel to use this command.`)
+        if(musicOn === true) return message.reply(`You must stop music playback before starting TTS, use \`!stop\` to stop music playback.`)
         ttsChannel = message.channel.id
         tts_text = "Text to speach is ready, TTS will use the channel the command was ran in as the input channel."
         ttsOn = true
-        message.channel.send(`TTS is now actave, TTS commands and input are locked to ${message.channel}. User message rate of 5 seconds is actave.`)
+        message.channel.send(`TTS is now active, TTS commands and input are locked to ${message.channel}. User message rate of 5 seconds is active.`)
         message.channel.setRateLimitPerUser(5)
         tts(message)
     }
-    else if(command === 'tts_off' || command === 'stop_tts'){
-        if(ttsOn === false) return message.channel.send(':x: TTS is alreay off, use `!leave` to disconnect the bot form a channel')
-        let ttsChannelname = message.guild.channels.cache.get(ttsChannel)
-        if(message.channel.id !== ttsChannel) return message.channel.send(`:x: You must run this command in the current TTS channel, ${ttsChannelname}`)
-        ttsOn = false
-        ttsChannel = null
+    else if(command === 'tts_off'){
+        if(ttsOn === false) return message.channel.send(':x: TTS is alreay off, use `!leave` to disconnect the bot form a channel.')
+        //let ttsChannelname = message.guild.channels.cache.get(ttsChannel)
+        //if(message.channel.id !== ttsChannel) return message.channel.send(`:x: You must run this command in the current TTS channel, ${ttsChannelname}`)
         const connection = getVoiceConnection(message.guild.id);
-        if (connection) {
+        if(connection) {
           // Disconnect from the voice channel
           connection.destroy();
           voiceConnection = null
           message.channel.setRateLimitPerUser(0)
+          ttsOn = false
+          ttsChannel = null
+          ttsPlayerStatus = false
+          ttsQueue = []
           //console.log(`Disconnected from ${connection.joinConfig.channel.name} voice channel!`);
            message.channel.send(`TTS and channel message rate is off and I have left the voice channel! :wave:`);
         } else {
@@ -1965,6 +2014,10 @@ async function tts(message){
         if(voiceConnection.status===VoiceConnectionStatus.Connected){
             voiceConnection.subscribe(audioPlayer);
             audioPlayer.play(audioResource);
+            audioPlayer.once('playing', () => ttsPlayerStatus = audioPlayer.state.status)
+
+            audioPlayer.once('idle', () => ttsPlayerStatus = audioPlayer.state.status)
+            
         }
 }
 client.login(process.env.BOT_USER_TOKEN)
