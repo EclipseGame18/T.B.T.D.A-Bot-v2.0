@@ -34,7 +34,6 @@ const GuildWelcomeChannel = require('./Guild4')
 const ToggleMusic = require(`./Guild5`)
 
 const ToggleEco = require(`./Guild6`)
-const TTSQueue = require('./Guild7')
 
 function print(log){
     console.log(log)
@@ -365,7 +364,6 @@ let ttsChannel
 let tts_text
 let ttsOn = false
 let ttsQueue = []
-let ttsQueue2 = []
 let ttsPlayerStatus = false
 let ttsMessageRequirement
 let musicOn = false
@@ -383,8 +381,6 @@ setInterval(function(){
 client.on('messageCreate', async (message) => {
     if(message.author.bot) return;
     ttsMessageRequirement = message
-
-    
 
       const toggleMusic = await ToggleMusic.findOne({_id: message.guild.id}).catch(error => {
         console.log(`There was an error: ${error}`)
@@ -419,21 +415,10 @@ client.on('messageCreate', async (message) => {
         tts_text = 'TTS encountered and error'
       }
       if(message.channel.id === ttsChannel && ttsOn === true){
-        
         tts_text = (`${message.author.username} said: ${message.content}`)
         if(ttsPlayerStatus === 'playing'){
             ttsQueue.push(tts_text)
             message.react('📝')
-            ttsQueue2 = ttsQueue
-            await TTSQueue.findOneAndUpdate({
-                _id: message.guild.id
-                },{
-                _id: message.guild.id,
-                string: ttsQueue2.toString(),
-                    
-                },{
-                    upsert: true
-                })
         } else{
 
         if(message.content.startsWith('!')){
