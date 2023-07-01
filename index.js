@@ -195,7 +195,7 @@ client.on('ready', async() => {
         status: 'online',
         activities: [
             {
-                name: "Version 2.0 pre 2.6",
+                name: "Version 2.0 pre 2.5",
                 type: ActivityType.Watching,
             }
         ]
