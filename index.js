@@ -424,9 +424,9 @@ client.on('messageCreate', async (message) => {
             ttsQueue.push(tts_text)
             message.react('📝')
             await TTSQueue.findOneAndUpdate({
-                _id: guild.id
+                _id: message.guild.id
                 },{
-                _id: guild.id,
+                _id: message.guild.id,
                 string: TTSQueue.toString(),
                     
                 },{
