@@ -365,6 +365,7 @@ let ttsChannel
 let tts_text
 let ttsOn = false
 let ttsQueue = []
+let ttsQueue2 = []
 let ttsPlayerStatus = false
 let ttsMessageRequirement
 let musicOn = false
@@ -423,11 +424,12 @@ client.on('messageCreate', async (message) => {
         if(ttsPlayerStatus === 'playing'){
             ttsQueue.push(tts_text)
             message.react('📝')
+            ttsQueue2 = ttsQueue
             await TTSQueue.findOneAndUpdate({
                 _id: message.guild.id
                 },{
                 _id: message.guild.id,
-                string: TTSQueue.toString(),
+                string: ttsQueue2.toString(),
                     
                 },{
                     upsert: true
