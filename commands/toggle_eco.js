@@ -1,12 +1,12 @@
 const { CommandType } = require("wokcommands");
 const { PermissionsBitField } = require('discord.js')
-const ToggleAntiSware = require('../Guild2')
+const ToggleEco = require('../Guild6')
 
 module.exports = {
   // command options
-  description: "Toggles the anti-swear plugin on or off",
+  description: "Toggles the economy plugin on or off",
   catagory: 'Mod/Admin Commands',
-  aliases: ['swear'],
+  aliases: ['eco'],
   minArgs: 1,
   maxArgs: 1,
   expectedArgs: "[toggle on or off]",
@@ -18,11 +18,11 @@ module.exports = {
   // Invoked when a user runs the command
   callback: async ({ message, client, channel, interaction, options, args, guild, user, member }) => {
     if(!member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return':x: Unable to comply, you do not have \`Manage_Guild\` permision.'
-    const toggleSware = await ToggleAntiSware.findOne({_id: guild.id}).catch(error =>{
+    const toggleEco = await ToggleEco.findOne({_id: guild.id}).catch(error =>{
 		console.log(`There was a error: ${error}`)
 	})
     let truetoggle = {}
-			if (toggleSware.toggle == 'true'){
+			if (toggleEco.toggle == 'true'){
 				 truetoggle = 'on'
 			}
 			else {
@@ -33,7 +33,7 @@ module.exports = {
 				return(`:x: Unable to comply, the plugin is already set to \`${truetoggle}\`!`);
 			} else{
 			if (toggle === 'on'){
-					await ToggleAntiSware.findOneAndUpdate({
+					await ToggleEco.findOneAndUpdate({
 						_id: guild.id
 						},{
 						_id: guild.id,
@@ -43,10 +43,10 @@ module.exports = {
 							upsert: true
 						})
 						
-						return('Successfully toggled anti-swear plugin to: `on`')
+						return('Successfully toggled economy plugin to: `on`')
 					}else if (toggle === 'off'){
 				
-					await ToggleAntiSware.findOneAndUpdate({
+					await ToggleEco.findOneAndUpdate({
 						_id: guild.id
 						},{
 						_id: guild.id,
@@ -56,9 +56,9 @@ module.exports = {
 							upsert: true
 						})
 						
-						return('Successfully toggled anti-swear plugin to: `off`')
+						return('Successfully toggled economy plugin to: `off`')
 					} else{
-						return(`:x: ERROR: please only input \`on\` or \`off\` *e.g. /toggle_swear on*.\n Current setting: \`${truetoggle}\``)
+						return(`:x: ERROR: please only input \`on\` or \`off\` *e.g. /toggle_eco on*.\n Current setting: \`${truetoggle}\``)
 					}
 				}
   },

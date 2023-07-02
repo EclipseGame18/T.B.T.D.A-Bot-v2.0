@@ -37,5 +37,11 @@
     "youtubei": "^1.1.2",
     "ytdl-core": "github:khlevon/node-ytdl-core#v4.11.4-patch.1",
     "ytsr": "^3.8.2"
-  }
+  },
+    "overrides": {
+      "discord-music-player": {
+        "@discordjs/voice": "^0.16.0"
+      }
+    }
+  
 }

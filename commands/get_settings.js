@@ -3,6 +3,8 @@ const { PermissionsBitField, EmbedBuilder } = require('discord.js')
 const GuildWelcomeChannel = require('../Guild4')
 const GuildWelcome = require('../Guild3')
 const ToggleAntiSware = require('../Guild2')
+const ToggleMusic = require(`../Guild5`)
+const ToggleEco = require(`../Guild6`)
 
 module.exports = {
   // command options
@@ -36,6 +38,33 @@ module.exports = {
       } catch{
         truetoggle = 'Error retreving guild anti-swear status.'
       }
+      const toggleMusic = await ToggleMusic.findOne({_id: guild.id}).catch(error => {
+        console.log(`There was an error: ${error}`)
+      })
+      const toggleEco = await ToggleEco.findOne({_id: guild.id}).catch(error => {
+        console.log(`There was an error: ${error}`)
+      })
+      let musicToggle
+      let ecoToggle
+      try{
+      if(toggleMusic.toggle === 'true'){
+        musicToggle = 'on'
+      } else{
+        musicToggle = 'off'
+      }
+    }catch{
+      musicToggle = 'Error retreving Music module status'
+    }
+
+    try{
+      if(toggleEco.toggle === 'true'){
+        ecoToggle = 'on'
+      }else{
+        ecoToggle = 'off'
+      }
+    }catch{
+      ecoToggle = 'Error Economy module status'
+    }
 
       let welcomeToggle;
       let welcomeValue;
@@ -68,6 +97,8 @@ module.exports = {
         .setTitle('Current server settings:')
         .addFields(
             {name: "Guild anti-swear", value: `The guild anti-swear plugin is currentaly: \`${truetoggle}\``},
+            {name: "Guild Economy plugin", value: `The Economy plugin is currentaly: \`${ecoToggle}\``},
+            {name: "Guild Music plugin", value: `The Music plugin is currentaly: \`${musicToggle}\``},
             {name: "Guild welcome message", value: `The guild welcome message plugin is currentaly: \`${welcomeToggle}\`. Settig value:\n\`${welcomeValue}\``},
             {name: "Guild log and welcome channel", value: `The guild log and welcome channel is currentaly: \`${logChannel}\`. Setting Value:\n\`${logValue}\``}
         )

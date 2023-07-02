@@ -2105,7 +2105,7 @@ async function infoMessage(message){
     if(chance > 0){
 		const UME = new EmbedBuilder()
             .setTitle('You have a message form the developers!')
-            .setDescription(`Hey, ${message.author}, you have a important message from the developers.\nTo view the important announcement, use command \`/notice\` (or \`!notice\`).`)
+            .setDescription(`Hey, ${message.author}, you have a important message from the developers.\nTo view the important announcement, use command \`/notice notice\` (or \`!notice notice\`).`)
             .setColor('#0059FF');
         message.reply({ embeds: [UME] });
         await moveMessageCooldown.addUser(message.author.id)
