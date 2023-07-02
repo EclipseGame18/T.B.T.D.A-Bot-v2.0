@@ -15,7 +15,7 @@ const ms = require('ms')
 const stealCooldown = new CommandCooldown('steal', ms('10m'))
 const begCooldown = new CommandCooldown('beg', ms('5m'))
 const depCooldown = new CommandCooldown('dep', ms('60s'))
-const moveMessageCooldown = new CommandCooldown('msg', ms('5s'))
+const moveMessageCooldown = new CommandCooldown('msg', ms('5m'))
 
 const path = require('path');
 require("dotenv/config");
