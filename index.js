@@ -2077,7 +2077,7 @@ async function tts(message){
 
 async function infoMessage(message){
     if(importantMessage === false) return
-    const underCooldown = await moveMessageCooldown.getUser(message.guild.id)
+    const underCooldown = await moveMessageCooldown.getUser(message.author.id)
         if(underCooldown){
             return
         }
@@ -2099,7 +2099,7 @@ async function infoMessage(message){
     }
     const chance = generateRandom()
     if(chance < 0 || chance === 0){
-        await moveMessageCooldown.addUser(message.guild.id)
+        await moveMessageCooldown.addUser(message.author.id)
         return
     }
     if(chance > 0){
@@ -2108,7 +2108,7 @@ async function infoMessage(message){
             .setDescription(`Hey, ${message.author}, you have a important message from the developers.\nTo view the important announcement, use command \`/notice\` (or \`!notice\`).`)
             .setColor('#0059FF');
         message.reply({ embeds: [UME] });
-        await moveMessageCooldown.addUser(message.guild.id)
+        await moveMessageCooldown.addUser(message.author.id)
     }
 
 }
