@@ -556,6 +556,7 @@ if (message.mentions.has(client.user.id)) {
 
     args[0];
     if(command == 'play'){
+        if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         infoMessage(message)
         if (!message.member.voice.channel) {
             return message.reply(":x: Unable to comply, you need to be in a voice channel to use this command.");
@@ -580,6 +581,7 @@ if (message.mentions.has(client.user.id)) {
         });
     }
     else if(command == 'playlist'){
+        if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         infoMessage(message)
         if (!message.member.voice.channel) {
             return message.reply(":x: Unable to comply, you need to be in a voice channel to use this command.");
@@ -603,6 +605,7 @@ if (message.mentions.has(client.user.id)) {
         });
     }
     else if(command == 'skip'){
+        if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         infoMessage(message)
         try{
             guildQueue.skip();
@@ -616,6 +619,7 @@ if (message.mentions.has(client.user.id)) {
 		message.channel.send({embeds: [skip]});
     }
     else if(command == 'stop'){
+        if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         infoMessage(message)
         try{
             guildQueue.stop()
@@ -631,6 +635,7 @@ if (message.mentions.has(client.user.id)) {
 		message.channel.send({embeds: [stop]});
     }
     else if(command === 'loopoff') {
+        if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         infoMessage(message)
         try{
             guildQueue.setRepeatMode(RepeatMode.DISABLED); // or 0 instead of RepeatMode.DISABLED
@@ -646,6 +651,7 @@ if (message.mentions.has(client.user.id)) {
     }
 
     else if(command === 'loopsong') {
+        if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         infoMessage(message)
         try{
             guildQueue.setRepeatMode(RepeatMode.SONG); // or 1 instead of RepeatMode.SONG
@@ -661,6 +667,7 @@ if (message.mentions.has(client.user.id)) {
     }
 
     else if(command === 'loopqueue') {
+        if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         infoMessage(message)
         try{
             guildQueue.setRepeatMode(RepeatMode.QUEUE); // or 2 instead of RepeatMode.QUEUE
@@ -676,6 +683,7 @@ if (message.mentions.has(client.user.id)) {
     }
 
     else if(command === 'setvolume') {
+        if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         infoMessage(message)
         try{
             if(!args[0]) return message.reply('Please specify a new volume.')
@@ -694,6 +702,7 @@ if (message.mentions.has(client.user.id)) {
     }
 
     else if(command === 'seek') {
+        if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         infoMessage(message)
         try{
             if(!args[0]) return message.reply('Please specify a time in seconds to seek.')
@@ -710,6 +719,7 @@ if (message.mentions.has(client.user.id)) {
     }
 
     else if(command === 'clearqueue') {
+        if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         infoMessage(message)
         try{
             guildQueue.clearQueue();
@@ -725,6 +735,7 @@ if (message.mentions.has(client.user.id)) {
     }
 
     else if(command === 'shuffle') {
+        if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         infoMessage(message)
         try{
             guildQueue.shuffle();
@@ -740,6 +751,7 @@ if (message.mentions.has(client.user.id)) {
     }
 
     else if(command === 'queue') {
+        if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         infoMessage(message)
         try{
             let initqueue = player.getQueue(message.guild.id)
@@ -761,6 +773,7 @@ if (message.mentions.has(client.user.id)) {
     }
 
     else if(command === 'volume') {
+        if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         infoMessage(message)
         try{
             const volume = new EmbedBuilder()
@@ -775,6 +788,7 @@ if (message.mentions.has(client.user.id)) {
     }
 
     else if(command === 'playing') {
+        if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         infoMessage(message)
         try{
             const ProgressBar = guildQueue.createProgressBar();
@@ -794,6 +808,7 @@ if (message.mentions.has(client.user.id)) {
     }
 
     else if(command === 'pause') {
+        if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         infoMessage(message)
         try{
             guildQueue.setPaused(true);
@@ -809,6 +824,7 @@ if (message.mentions.has(client.user.id)) {
     }
 
     else if(command === 'resume') {
+        if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         infoMessage(message)
         try{
             guildQueue.setPaused(false);
@@ -824,6 +840,7 @@ if (message.mentions.has(client.user.id)) {
     }
 
     else if(command === 'remove') {
+        if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         infoMessage(message)
         if(!guildQueue) return message.channel.send(':x: Unable to comply, the queue is currentaly empty.')
         try{
@@ -842,6 +859,7 @@ if (message.mentions.has(client.user.id)) {
     }
 
     else if(command === 'progress') {
+        if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         infoMessage(message)
         try{
         const ProgressBar = guildQueue.createProgressBar();

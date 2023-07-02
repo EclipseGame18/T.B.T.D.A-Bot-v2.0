@@ -24,7 +24,7 @@ module.exports = {
               .addFields(
                     {name: "What does this mean?", value: `The bot you are currentaly using, T.B.T.D.A Beta Test, was only intended to be used for a short while. This was because T.B.T.D.A was (and still is) undergoing a massive re-write and fix-up, and it was going to be quite experemental and buggy, so instead of using the old bot, we used this one as a beta test.`},
                     {name: "When will the change occur?", value: `We estimate around in 1-2 months T.B.T.D.A Beta Test will be deactovated and T.B.T.D.A will take over.`},
-                    {name: "I need more help, where can I get it?", value: `If you need any more help reguardiung this change, or just have questions on T.B.T.D.A, you can join our support server [here](https://discord.com/invite/3mkKSGw). If you want to invite to bot, and configure it, you can use the [online web dashboard](https://tbtda.xyz)`}
+                    {name: "I need more help, where can I get it?", value: `If you need any more help reguardiung this change, or just have questions on T.B.T.D.A, you can join our support server [here](https://discord.com/invite/3mkKSGw). If you want to invite the bot, and configure it, you can use the [online web dashboard](https://tbtda.xyz)`}
                 )
           .setColor('#0059FF');
           if(message){
