@@ -8,7 +8,7 @@ const feedbackCooldown = new CommandCooldown('feedback', ms('2h'))
 
 module.exports = {
   // command options
-  description: "Sends feedback to the developer",
+  description: "Sends feedback to the developer.",
   catagory: 'Utility Commands',
   minArgs: 1,
   expectedArgs: "[feedback]",
