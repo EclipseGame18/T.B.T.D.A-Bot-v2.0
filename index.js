@@ -243,6 +243,10 @@ client.on('guildMemberAdd', async(member) =>{
                 const EditWelcomeGuildMessage =  WelcomeGuildMessage.replace('{member}', member.user.username)
                 WelcomeGuildMessage = EditWelcomeGuildMessage;
             }
+            if(WelcomeGuildMessage.includes('{ping-member}')){
+                const EditWelcomeGuildMessage =  WelcomeGuildMessage.replace('{ping-member}', member)
+                WelcomeGuildMessage = EditWelcomeGuildMessage;
+            }
         member.guild.channels.cache.get(welcomemessagechannel.channel).send(WelcomeGuildMessage)
         } catch(err){
             console.log('There was an error sending the welcome message: ' + err)
