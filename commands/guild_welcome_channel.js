@@ -1,12 +1,12 @@
 const { CommandType } = require("wokcommands");
 const { PermissionsBitField } = require('discord.js')
-const GuildLogChannel = require('../Guild7')
+const GuildWelcomeChannel = require('../Guild4')
 
 module.exports = {
   // command options
-  description: "Input the channel ID ot be used as a log channel. Leave blank to disable",
+  description: "Input the channel ID ot be used as a welcome channel. Leave blank to disable",
   catagory: 'Utility Commands',
-  aliases: ['log_channel'],
+  aliases: ['welcome_channel'],
   maxArgs: 30,
   expectedArgs: "[channel ID]",
   guildOnly: true,
@@ -16,17 +16,17 @@ module.exports = {
 
   // Invoked when a user runs the command
   callback: async ({ message, client, channel, interaction, options, args, text, guild, user, member }) => {
-    const guildlogchannel = await GuildLogChannel.findOne({_id: guild.id}).catch(error =>{
+    const guildwelcomechannel = await GuildWelcomeChannel.findOne({_id: guild.id}).catch(error =>{
 		console.log(`There was a error`)
 	})
     if (!member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return ':x: Unable to comply, you do not have \`Manage_Guild\` permision.'
     let newText
-    if(!guildlogchannel){
-        await GuildLogChannel.findOneAndUpdate({
+    if(!guildwelcomechannel){
+        await GuildWelcome.findOneAndUpdate({
             _id: guild.id
             },{
             _id: guild.id,
-            channel: '',
+            message: '',
                 
             },{
                 upsert: true
@@ -43,7 +43,7 @@ module.exports = {
        if(newText.length > 30){
         return `Channel IDs usually arn't bigger than 30 characters`
        }
-       await GuildLogChannel.findOneAndUpdate({
+       await GuildWelcomeChannel.findOneAndUpdate({
         _id: guild.id
         },{
         _id: guild.id,
@@ -53,9 +53,9 @@ module.exports = {
             upsert: true
         })
         if(newText === ''){
-            return `Successfully toggled log channel to: \`off\``
+            return `Successfully toggled welcome channel to: \`off\``
         } else{
-        return `Successfully toggled log channel plugin to: \`on\` and changed the server log channel to: \`${newText}\`.\nPlease run the \`/test_log\` command to confirm log channel.`
+        return `Successfully toggled welcome channel plugin to: \`on\` and changed the server welcome channel to: \`${newText}\`.\nPlease run the \`/test_log\` command to confirm welcome channel.`
         }
   },
 }

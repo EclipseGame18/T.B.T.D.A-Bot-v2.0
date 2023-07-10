@@ -36,6 +36,8 @@ const ToggleMusic = require(`./Guild5`)
 
 const ToggleEco = require(`./Guild6`)
 
+const LogChannel = require(`./Guild7`)
+
 function print(log){
     console.log(log)
 }
@@ -303,6 +305,15 @@ client.on("guildCreate", async (guild) => {
                             },{
                                 upsert: true
                             })
+                            await LogChannel.findOneAndUpdate({
+                                _id: guild.id
+                                },{
+                                _id: guild.id,
+                                channel: '',
+                                
+                                },{
+                                    upsert: true
+                            })
                     const welcomemessagechannel = await GuildWelcomeChannel.findOne({_id: guild.id}).catch(error =>{
                         console.log(`There was a error: ${error}`)
                       })
@@ -318,13 +329,20 @@ client.on("guildCreate", async (guild) => {
                       const toggleEco = await ToggleEco.findOne({_id: guild.id}).catch(error => {
                         console.log(`There was an error: ${error}`)
                       })
+                      const logChannel = await LogChannel.findOne({_id: guild.id}).catch(error => {
+                        console.log(`There was an error: ${error}`)
+                      })
                         let guildwelcometoggle;
+                        let logchannelcheck;
                         let welcomemessageschanneltoggle;
                         if(guildwelcome.message === ''){
                             guildwelcometoggle = '(nothing)'
                         }
                         if(welcomemessagechannel.channel === ''){
                             welcomemessageschanneltoggle = '(nothing)'
+                        }
+                        if(logChannel.channel === ''){
+                            logchannelcheck = '(nothing)'
                         }
 	setTimeout(async () => {
     /*
@@ -354,7 +372,7 @@ client.on("guildCreate", async (guild) => {
         //console.log(`Unable to send welcome message in ${guild.name}`)
     //}
     */
-    console.log(`Joined ${guild.name} with ${guild.memberCount} users. ID: ${guild.id}\nAnti-swear: ${toggleSware.toggle}.\nWelcome message: ${guildwelcometoggle}.\nLog channel: ${welcomemessageschanneltoggle}.\nMusic toggle: ${toggleMusic.toggle}.\nEco toggle: ${toggleEco.toggle}`)
+    console.log(`Joined ${guild.name} with ${guild.memberCount} users. ID: ${guild.id}\nAnti-swear: ${toggleSware.toggle}.\nWelcome message: ${guildwelcometoggle}.\nwelcome channel: ${welcomemessageschanneltoggle}.\nLog channel: ${logchannelcheck}\nMusic toggle: ${toggleMusic.toggle}.\nEco toggle: ${toggleEco.toggle}`)
     }, 2000);
 });
 
@@ -383,6 +401,14 @@ setInterval(function(){
 client.on('messageCreate', async (message) => {
     if(message.author.bot) return;
     ttsMessageRequirement = message
+
+    const welcomemessagechannel = await GuildWelcomeChannel.findOne({_id: message.guild.id}).catch(error =>{
+        console.log(`There was a error: ${error}`)
+      })
+
+      const logChannel = await LogChannel.findOne({_id: message.guild.id}).catch(error => {
+        console.log(`There was an error: ${error}`)
+      })
 
       const toggleMusic = await ToggleMusic.findOne({_id: message.guild.id}).catch(error => {
         console.log(`There was an error: ${error}`)
@@ -474,9 +500,29 @@ try{
 		 	} else if (message.content.toLowerCase().includes(blacklisted[i].toLowerCase())){
 				message.delete().catch(error =>{
 					console.log(`Failed to delete blacklisted word sent by ${user.username} in ${message.guild.name}, ID: ${message.guild.id}`)
-					message.channel.send(`:x: Failed to delete message, try checking my permissions.`)
+					message.channel.send(`:x: Failed to delete message, try checking my permissions.`).then(msg => {setTimeout(() => msg.delete(), 8000)})
 				});
 				message.channel.send(`${user}, Please don't use that language here!`).then(msg => {setTimeout(() => msg.delete(), 8000)})
+                let canLog
+                if(logChannel.channel !== ''){
+                    canLog = true
+                }else{
+                    false
+                }
+
+                if(canLog === true){
+                    const swear = new EmbedBuilder()
+                    .setTitle('User Warned')
+                    .addFields(
+                        {name: 'User', value: `${message.author}`},
+                        {name: 'Warned by', value: `${client.user} (auto mod)`},
+                        {name: 'Reason', value: `Bad words`}
+                    )
+                    .setTimestamp()
+                    .setColor('#FF6400')
+
+                    message.guild.channels.cache.get(logChannel.channel).send({embeds: [swear]})
+                }
 		 	}
 		}
 	}

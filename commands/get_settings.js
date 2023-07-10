@@ -5,6 +5,7 @@ const GuildWelcome = require('../Guild3')
 const ToggleAntiSware = require('../Guild2')
 const ToggleMusic = require(`../Guild5`)
 const ToggleEco = require(`../Guild6`)
+const LogChannel = require(`../Guild7`)
 
 module.exports = {
   // command options
@@ -25,6 +26,9 @@ module.exports = {
         console.log(`There was a error: ${error}`)
       })
       const toggleSware = await ToggleAntiSware.findOne({_id: guild.id}).catch(error =>{
+        console.log(`There was a error: ${error}`)
+      })
+      const logchannel = await LogChannel.findOne({_id: guild.id}).catch(error =>{
         console.log(`There was a error: ${error}`)
       })
       let truetoggle;
@@ -83,15 +87,29 @@ module.exports = {
         let logChannel;
         let logValue
         try{
-        if(welcomemessagechannel.channel === ''){
+        if(logchannel.channel === ''){
             logChannel = 'off';
             logValue = 'null';
         } else{
             logChannel = 'on';
-            logValue = welcomemessagechannel.channel;
+            logValue = logchannel.channel;
         }
         } catch{
             logChannel = 'Error retreving log channel status'
+        }
+
+        let welcomeChannel;
+        let welcomeValuechannel;
+        try{
+        if(welcomemessagechannel.channel === ''){
+          welcomeChannel = 'off';
+          welcomeValuechannel = 'null';
+        } else{
+          welcomeChannel = 'on';
+          welcomeValuechannel = welcomemessagechannel.channel;
+        }
+        } catch{
+          welcomeChannel = 'Error retreving log channel status'
         }
         const settings = new EmbedBuilder()
         .setTitle('Current server settings:')
@@ -100,7 +118,8 @@ module.exports = {
             {name: "Guild Economy plugin", value: `The Economy plugin is currentaly: \`${ecoToggle}\``},
             {name: "Guild Music plugin", value: `The Music plugin is currentaly: \`${musicToggle}\``},
             {name: "Guild welcome message", value: `The guild welcome message plugin is currentaly: \`${welcomeToggle}\`. Settig value:\n\`${welcomeValue}\``},
-            {name: "Guild log and welcome channel", value: `The guild log and welcome channel is currentaly: \`${logChannel}\`. Setting Value:\n\`${logValue}\``}
+            {name: "Guild Log channel", value: `The guild log channel is currentaly: \`${logChannel}\`. Setting Value:\n\`${logValue}\``},
+            {name: "Guild Welcome channel", value: `The guild log channel is currentaly: \`${welcomeChannel}\`. Setting Value:\n\`${welcomeValuechannel}\``}
         )
         .setColor('#00B9FF')
         .setTimestamp()

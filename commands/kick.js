@@ -1,6 +1,6 @@
 const { CommandType } = require("wokcommands");
 const { PermissionsBitField, EmbedBuilder } = require('discord.js')
-const GuildWelcomeChannel = require('../Guild4')
+const GuildWelcomeChannel = require('../Guild7')
 
 module.exports = {
   // command options
@@ -34,6 +34,18 @@ module.exports = {
     const guildLog = await GuildWelcomeChannel.findOne({_id: guild.id}).catch(error =>{
 		console.log(`There was a error`)
 	})
+    if(!guildLog){
+        await GuildWelcomeChannel.findOneAndUpdate({
+            _id: guild.id
+            },{
+            _id: guild.id,
+            channel: '',
+                
+            },{
+                upsert: true
+            })
+            return'There was an unexpected error, please try again. :shrug:'
+    }
     let tokick = message ? message.mentions.members.first() : interaction.options.getMember('user')
             if(!tokick) return `${args[0]} is not a member.`;
             if (guild.ownerId === tokick.id) return message.reply(':x: You are not powerful enougth to kick the server owner!')

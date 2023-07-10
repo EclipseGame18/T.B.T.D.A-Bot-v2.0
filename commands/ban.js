@@ -1,6 +1,6 @@
 const { CommandType } = require("wokcommands");
 const { PermissionsBitField, EmbedBuilder } = require('discord.js')
-const GuildWelcomeChannel = require('../Guild4')
+const GuildWelcomeChannel = require('../Guild7')
 
 module.exports = {
   // command options
@@ -40,6 +40,18 @@ module.exports = {
     const guildLog = await GuildWelcomeChannel.findOne({_id: guild.id}).catch(error =>{
 		console.log(`There was a error`)
 	})
+    if(!guildLog){
+        await GuildWelcomeChannel.findOneAndUpdate({
+            _id: guild.id
+            },{
+            _id: guild.id,
+            channel: '',
+                
+            },{
+                upsert: true
+            })
+            return'There was an unexpected error, please try again. :shrug:'
+    }
     let tokick = message ? message.mentions.members.first() : interaction.options.getMember('user')
             if(!tokick) return `${args[0]} is not a member.`;
             if (guild.ownerId === tokick.id) return message.reply(':x: You are not powerful enougth to ban the server owner!')
@@ -90,13 +102,13 @@ module.exports = {
                 if(canLog === true){
                     guild.channels.cache.get(guildLog.channel).send({embeds: [x]})
                     }
-				tokick.ban({
-                    reason,
-                    deleteMessageDays: daysdelete
-                }).catch(error =>{
-				console.log(`Failed to ban ${tokick.displayName} in ${guild.name}: ${error}`)
-			    return `:x: Error: I was unable to ban the member due to an unknown error. :shrug:`
-			});
+				//tokick.ban({
+                   // reason,
+                   // deleteMessageDays: daysdelete
+                //}).catch(error =>{
+				//console.log(`Failed to ban ${tokick.displayName} in ${guild.name}: ${error}`)
+			    //return `:x: Error: I was unable to ban the member due to an unknown error. :shrug:`
+			//});
 			}
 
 },
