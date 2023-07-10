@@ -4,7 +4,7 @@ const GuildWelcomeChannel = require('../Guild7')
 
 module.exports = {
   // command options
-  description: "Kicks a user from the guild.",
+  description: "Warns a user in yout guild.",
   catagory: 'Mod/Admin Commands',
   minArgs: 2,
   expectedArgs: "<user> <reason>",
@@ -13,24 +13,25 @@ module.exports = {
   options: [
     {
       name: 'user',
-      description: 'Select a user to kick',
+      description: 'Select a user to warn',
       type: 6, // Set the option type to 6 (User mention)
       required: true,
     },
     {
         name: 'reason',
-        description: 'Reason for kicking the user',
+        description: 'Reason for warning the user',
         type: 3,
         required: true,
     }
   ],
+  guildOnly: true,
   
   // Create a legacy and slash command
   type: CommandType.BOTH,
 
   // Invoked when a user runs the command
   callback: async ({ message, client, channel, interaction, options, args, guild, user, member }) => {
-    if(!member.permissions.has(PermissionsBitField.Flags.KickMembers)) return ':x: Unable to comply, you do not have \`Kick_Members\` permision.'
+    if(!member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) return ':x: Unable to comply, you do not have \`Moderate_Members\` permision.'
     const guildLog = await GuildWelcomeChannel.findOne({_id: guild.id}).catch(error =>{
 		console.log(`There was a error`)
 	})
@@ -46,45 +47,41 @@ module.exports = {
             })
             return'There was an unexpected error, please try again. :shrug:'
     }
-    let tokick = message ? message.mentions.members.first() : interaction.options.getMember('user')
-            if(!tokick) return `${args[0]} is not a member.`;
-            if (guild.ownerId === tokick.id) return ':x: You are not powerful enougth to kick the server owner!'
-            if (!tokick.kickable) {
-				return ':x: I cannot kick someone if they either have higher ranking permissions than myself, or they are server admins.'
-			}
-            args.shift()
-            let reason = args.join(' ')
+    let towarn = message ? message.mentions.members.first() : interaction.options.getMember('user')
+    if(!towarn) return 'Please specify a user to warn'
+    if(guild.ownerId === towarn.id) return ':x: You are not powerful enougth to warn the server owner!'
+    args.shift()
+    let reason = args[0]
+    if(!reason){
+        reason = 'NO_REASON_SPECIFYED'
+    }
 
-			if (!reason) reason = ('NO_REASON_SPECIFYED');
+    const userwarn = new EmbedBuilder()
+        .setTitle(`You were warned in ${guild.name}`)
+        .addFields(
+            {name: 'Warned by:', value: `${member}`},
+            {name: 'Reason', value: `${reason}`}
+        )
+        .setTimestamp()
+        .setColor('#FF6400')
 
-			const userwarn = new EmbedBuilder()
-            .setTitle(`You were kicked in ${guild.name}`)
-            .addFields(
-                {name: 'Kicked by:', value: `${member}`},
-                {name: 'Reason', value: `${reason}`}
-            )
-            .setTimestamp()
-            .setColor('#E01212')
-
-        tokick.send({ embeds: [userwarn] })
-			
-			if (tokick.kickable) {
-                let canLog
+    towarn.send({ embeds: [userwarn] })
+    let canLog
                 if(guildLog.channel !== ''){
                     canLog = true
                 }else{
                     false
                 }
 
-				let x = new EmbedBuilder()
-					.setTitle('User Successfully Kicked')
+                let x = new EmbedBuilder()
+					.setTitle('User Warned')
                     .setDescription(`${canLog ? ` ` : 'No log was filed, reason: `There is currentaly no log channel in our records`'}`)
                     .addFields(
-                        {name: 'Member Kicked', value: `${tokick}`},
-                        {name: 'Kicked by', value: `${member}`},
-                        {name: 'Reason', value: `${reason}`}
+                        {name: 'Member Warned', value: `${towarn}`},
+                        {name: 'Warned by', value: `${member}`},
+                        {name: 'Reason', value: `${reason}`},
                     )
-					.setColor('#E01212')
+					.setColor('#FF6400')
                     .setTimestamp()
 
                     if(canLog === true){
@@ -101,12 +98,5 @@ module.exports = {
                 if(interaction){
                     interaction.reply({embeds: [x]});
                 }
-				
-				tokick.kick(reason).catch(error =>{
-				console.log(`Failed to kick ${tokick.displayName} in ${guild.name}: ${error}`)
-			    return `:x: Error: I was unable to kick the member due to an unknown error. :shrug:`
-			});
-			}
-
-},
+  },
 }

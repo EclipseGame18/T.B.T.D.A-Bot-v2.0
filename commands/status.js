@@ -17,7 +17,7 @@ const setStatus = (client, newStatus) => {
 module.exports = {
   // command options
   description: "Sets the bot's status",
-  catagory: 'Owner Commands',
+  catagory: 'Developer Commands',
   guildOnly: false,
   minArgs: 1,
   expectedArgs: '[status]',

@@ -54,7 +54,7 @@ module.exports = {
     }
     let tokick = message ? message.mentions.members.first() : interaction.options.getMember('user')
             if(!tokick) return `${args[0]} is not a member.`;
-            if (guild.ownerId === tokick.id) return message.reply(':x: You are not powerful enougth to ban the server owner!')
+            if (guild.ownerId === tokick.id) return ':x: You are not powerful enougth to ban the server owner!'
             if (!tokick.bannable) {
 				return ':x: I cannot ban someone if they either have higher ranking permissions than myself, or they are server admins.'
 			}
@@ -71,7 +71,16 @@ module.exports = {
 
 			if (!reason) reason = ('NO_REASON_SPECIFYED');
 
-			tokick.send(`You were banned in **${guild.name}** for: \`${reason}\`:(`);
+			const userwarn = new EmbedBuilder()
+            .setTitle(`You were banned in ${guild.name}`)
+            .addFields(
+                {name: 'Banned by:', value: `${member}`},
+                {name: 'Reason', value: `${reason}`}
+            )
+            .setTimestamp()
+            .setColor('#E01212')
+
+        tokick.send({ embeds: [userwarn] })
 			
 			if (tokick.bannable) {
                 let canLog
@@ -90,8 +99,16 @@ module.exports = {
                         {name: 'Reason', value: `${reason}`},
                         {name: 'Days of messages deleted', value: `${daysdelete}`}
                     )
-					.setColor('#FF6400')
+					.setColor('#E01212')
                     .setTimestamp()
+
+                    if(canLog === true){
+                        try{
+                            guild.channels.cache.get(guildLog.channel).send({embeds: [x]})
+                            }catch{
+                                return 'There was an error sending the log to the log channel, try checking if the channel ID is correct.'
+                            }
+                        }
 
                 if(message){
 				message.channel.send({embeds: [x]});
@@ -99,16 +116,13 @@ module.exports = {
                 if(interaction){
                     interaction.reply({embeds: [x]});
                 }
-                if(canLog === true){
-                    guild.channels.cache.get(guildLog.channel).send({embeds: [x]})
-                    }
-				//tokick.ban({
-                   // reason,
-                   // deleteMessageDays: daysdelete
-                //}).catch(error =>{
-				//console.log(`Failed to ban ${tokick.displayName} in ${guild.name}: ${error}`)
-			    //return `:x: Error: I was unable to ban the member due to an unknown error. :shrug:`
-			//});
+				tokick.ban({
+                    reason,
+                    deleteMessageDays: daysdelete
+                }).catch(error =>{
+				console.log(`Failed to ban ${tokick.displayName} in ${guild.name}: ${error}`)
+			    return `:x: Error: I was unable to ban the member due to an unknown error. :shrug:`
+			});
 			}
 
 },

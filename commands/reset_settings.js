@@ -150,6 +150,7 @@ module.exports = {
                                 )
                                 .setColor('#00B9FF')
                                 .setTimestamp()
+                                .setFooter({ text: `Reset by ${member.displayName}` })
 
                                 if(message){
                                     message.channel.send({ embeds: [reset] })

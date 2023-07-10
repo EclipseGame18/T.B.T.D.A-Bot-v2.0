@@ -1,4 +1,4 @@
-const { Client, Events, GatewayIntentBits, Partials, messageLink, Message, EmbedBuilder, ActivityType, PermissionsBitField } = require ('discord.js');
+const { Client, Events, GatewayIntentBits, Partials, messageLink, Message, EmbedBuilder, ActivityType, PermissionsBitField, DMChannel } = require ('discord.js');
 
 const {AudioPlayer, createAudioResource, StreamType, entersState, VoiceConnectionStatus, joinVoiceChannel, getVoiceConnection, AudioPlayerStatus} = require('@discordjs/voice');
 
@@ -405,6 +405,8 @@ setInterval(function(){
 client.on('messageCreate', async (message) => {
     if(message.author.bot) return;
     ttsMessageRequirement = message
+
+    if(!message.guild) return
 
     const welcomemessagechannel = await GuildWelcomeChannel.findOne({_id: message.guild.id}).catch(error =>{
         console.log(`There was a error: ${error}`)
