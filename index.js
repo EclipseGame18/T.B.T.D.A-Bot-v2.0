@@ -198,7 +198,7 @@ client.on('ready', async() => {
         status: 'online',
         activities: [
             {
-                name: "Version 2.0 pre 2.7",
+                name: "Version 2.0 pre 2.8",
                 type: ActivityType.Watching,
             }
         ]
@@ -510,6 +510,7 @@ client.on('messageCreate', async (message) => {
 				upsert: true
 			})
 	} 
+
 try{
 	if (toggleSware.toggle === 'true'){
 		const blacklisted = ['fuck', 'shit', 'ass', 'cock', 'dick', 'c0ck', 'd1ck', 'nigger', 'cunt'];
