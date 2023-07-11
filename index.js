@@ -198,7 +198,7 @@ client.on('ready', async() => {
         status: 'online',
         activities: [
             {
-                name: "Version 2.0 pre 2.6",
+                name: "Version 2.0 pre 2.7",
                 type: ActivityType.Watching,
             }
         ]
@@ -422,6 +422,25 @@ client.on('messageCreate', async (message) => {
       const toggleEco = await ToggleEco.findOne({_id: message.guild.id}).catch(error => {
         console.log(`There was an error: ${error}`)
       })
+
+      const guildPrefix = await GuildPrefix.findOne({_id: message.guild.id}).catch(error => {
+        console.log(`There was an error: ${error}`)
+      })
+      if(!guildPrefix || guildPrefix.prefix === ''){
+        await GuildPrefix.findOneAndUpdate({
+            _id: message.guild.id
+            },{
+            _id: message.guild.id,
+            prefix: globalPrefix,
+                
+            },{
+                upsert: true
+            })
+      }
+      
+      let serverPrefix = guildPrefix.prefix
+      
+
       if(!toggleMusic || toggleMusic === null){
         await ToggleMusic.findOneAndUpdate({
             _id: message.guild.id
@@ -472,7 +491,7 @@ client.on('messageCreate', async (message) => {
       let ecoStatus = toggleEco.toggle;
       let musicStatus = toggleMusic.toggle;
 
-    const prefix = '!';
+    const prefix = serverPrefix || globalPrefix;
     const args = message.content.slice(prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();
 
@@ -541,7 +560,7 @@ if (message.mentions.has(client.user.id)) {
     message.react('👋')
     const ping = new EmbedBuilder()
     .setTitle(`Hello ${message.author.username}`)
-    .setDescription(`I am ${client.user.username}, my defult prefix is either **/** or **!**. If you need help please join our [support server.](https://discord.gg/3mkKSGw)`)
+    .setDescription(`I am ${client.user.username}, I support slash (**/**) commands and also legacy commands. My legacy command prefix is currentaly: **${prefix}**.\nIf you need help please join our [support server.](https://discord.gg/3mkKSGw)`)
     .setColor('#00B9FF')
     message.channel.send({embeds: [ping]})
   }
