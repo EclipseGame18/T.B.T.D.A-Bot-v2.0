@@ -117,10 +117,10 @@ module.exports = {
                             preveous.setDisabled(true)
                             await i.update({ embeds: [x], components: [buttons]})
                             tokick.send({ embeds: [userwarn] })
-                            //tokick.kick(reason).catch(error =>{
-                                //console.log(`Failed to kick ${tokick.displayName} in ${guild.name}: ${error}`)
-                               // return `:x: Error: I was unable to kick the member due to an unknown error. :shrug:`
-                            //});
+                            tokick.kick(reason).catch(error =>{
+                                console.log(`Failed to kick ${tokick.displayName} in ${guild.name}: ${error}`)
+                                return `:x: Error: I was unable to kick the member due to an unknown error. :shrug:`
+                            });
                             if(canLog === true){
                                 try{
                                     guild.channels.cache.get(guildLog.channel).send({embeds: [x]})
