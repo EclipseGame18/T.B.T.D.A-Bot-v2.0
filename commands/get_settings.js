@@ -6,6 +6,8 @@ const ToggleAntiSware = require('../Guild2')
 const ToggleMusic = require(`../Guild5`)
 const ToggleEco = require(`../Guild6`)
 const LogChannel = require(`../Guild7`)
+const ToggleImg = require(`../Guild8`)
+const GetPrefix = require(`../Guild`)
 
 module.exports = {
   // command options
@@ -31,6 +33,12 @@ module.exports = {
       const logchannel = await LogChannel.findOne({_id: guild.id}).catch(error =>{
         console.log(`There was a error: ${error}`)
       })
+      const toggleImg = await ToggleImg.findOne({_id: guild.id}).catch(error =>{
+        console.log(`There was a error: ${error}`)
+      })
+      const getPrefix = await GetPrefix.findOne({_id: guild.id}).catch(error =>{
+        console.log(`There was a error: ${error}`)
+      })
       let truetoggle;
       try{
               if (toggleSware.toggle == 'true'){
@@ -50,6 +58,7 @@ module.exports = {
       })
       let musicToggle
       let ecoToggle
+      let imgToggle
       try{
       if(toggleMusic.toggle === 'true'){
         musicToggle = 'on'
@@ -58,6 +67,16 @@ module.exports = {
       }
     }catch{
       musicToggle = 'Error retreving Music module status'
+    }
+    try {
+      if(toggleImg.toggle === 'true'){
+        imgToggle = 'on'
+      }
+      else{
+        imgToggle = 'off'
+      }
+    } catch  {
+      imgToggle = 'Error retreving Image Generation module status'
     }
 
     try{
@@ -115,8 +134,10 @@ module.exports = {
         .setTitle('Current server settings:')
         .addFields(
             {name: "Guild anti-swear", value: `The guild anti-swear plugin is currentaly: \`${truetoggle}\``},
+            {name: "Guild Prefix", value: `The Guild Prefix is currentaly: \`${getPrefix.prefix}\``},
             {name: "Guild Economy plugin", value: `The Economy plugin is currentaly: \`${ecoToggle}\``},
             {name: "Guild Music plugin", value: `The Music plugin is currentaly: \`${musicToggle}\``},
+            {name: "Guild Image Generation plugin", value: `The Image Generation plugin is currentaly: \`${imgToggle}\``},
             {name: "Guild welcome message", value: `The guild welcome message plugin is currentaly: \`${welcomeToggle}\`. Settig value:\n\`${welcomeValue}\``},
             {name: "Guild Log channel", value: `The guild log channel is currentaly: \`${logChannel}\`. Setting Value:\n\`${logValue}\``},
             {name: "Guild Welcome channel", value: `The guild log channel is currentaly: \`${welcomeChannel}\`. Setting Value:\n\`${welcomeValuechannel}\``}
