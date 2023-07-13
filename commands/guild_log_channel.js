@@ -5,7 +5,7 @@ const GuildLogChannel = require('../Guild7')
 module.exports = {
   // command options
   description: "Input the channel ID ot be used as a log channel. Leave blank to disable",
-  catagory: 'Utility Commands',
+  catagory: 'Mod/Admin Commands',
   aliases: ['log_channel'],
   maxArgs: 30,
   expectedArgs: "[channel ID]",

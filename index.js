@@ -38,6 +38,8 @@ const ToggleEco = require(`./Guild6`)
 
 const LogChannel = require(`./Guild7`)
 
+const ToggleImg = require('./Guild8')
+
 function print(log){
     console.log(log)
 }
@@ -198,7 +200,7 @@ client.on('ready', async() => {
         status: 'online',
         activities: [
             {
-                name: "Version 2.0 pre 2.8",
+                name: "Version 2.0 pre 2.8.5",
                 type: ActivityType.Watching,
             }
         ]
@@ -318,6 +320,15 @@ client.on("guildCreate", async (guild) => {
                                 },{
                                     upsert: true
                             })
+                            await ToggleImg.findOneAndUpdate({
+                                _id: guild.id
+                                },{
+                                _id: guild.id,
+                                toggle: true,
+                                
+                                },{
+                                    upsert: true
+                            })
                     const welcomemessagechannel = await GuildWelcomeChannel.findOne({_id: guild.id}).catch(error =>{
                         console.log(`There was a error: ${error}`)
                       })
@@ -336,6 +347,10 @@ client.on("guildCreate", async (guild) => {
                       const logChannel = await LogChannel.findOne({_id: guild.id}).catch(error => {
                         console.log(`There was an error: ${error}`)
                       })
+                      const toggleImg = await ToggleImg.findOne({_id: guild.id}).catch(error => {
+                        console.log(`There was an error: ${error}`)
+                      })
+
                         let guildwelcometoggle;
                         let logchannelcheck;
                         let welcomemessageschanneltoggle;
@@ -376,7 +391,7 @@ client.on("guildCreate", async (guild) => {
         //console.log(`Unable to send welcome message in ${guild.name}`)
     //}
     */
-    console.log(`Joined ${guild.name} with ${guild.memberCount} users. ID: ${guild.id}\nAnti-swear: ${toggleSware.toggle}.\nWelcome message: ${guildwelcometoggle}.\nwelcome channel: ${welcomemessageschanneltoggle}.\nLog channel: ${logchannelcheck}\nMusic toggle: ${toggleMusic.toggle}.\nEco toggle: ${toggleEco.toggle}`)
+    console.log(`Joined ${guild.name} with ${guild.memberCount} users. ID: ${guild.id}\nAnti-swear: ${toggleSware.toggle}.\nWelcome message: ${guildwelcometoggle}.\nwelcome channel: ${welcomemessageschanneltoggle}.\nLog channel: ${logchannelcheck}\nMusic toggle: ${toggleMusic.toggle}.\nEco toggle: ${toggleEco.toggle}.\nImage toggle: ${toggleImg.toggle}`)
     }, 2000);
 });
 
@@ -1758,7 +1773,7 @@ if (message.mentions.has(client.user.id)) {
                 .join('\n')}`
         )
     }
-    else if (command === 'item_unhide'){
+    else if (command === 'unhide_item'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
         if (!message.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return message.reply(`:x: Unable to comply, you do not have \`Manage_Guild\` permision.`)
         infoMessage(message)
@@ -1843,7 +1858,7 @@ if (message.mentions.has(client.user.id)) {
                 .join('\n')}`
         )
     }
-    else if (command === 'item_unlock'){
+    else if (command === 'unlock_item'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
         if (!message.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return message.reply(`:x: Unable to comply, you do not have \`Manage_Guild\` permision.`)
         infoMessage(message)
@@ -2112,15 +2127,15 @@ if (message.mentions.has(client.user.id)) {
         ttsChannel = message.channel.id
         tts_text = "Text to speach is ready, TTS will use the channel the command was ran in as the input channel."
         ttsOn = true
-        message.channel.send(`TTS is now active, TTS commands and input are locked to ${message.channel}. ${message.member.nickname} User message rate of 5 seconds is active.`)
+        message.channel.send(`TTS is now active, TTS commands and input are locked to ${message.channel}. User message rate of 5 seconds is active.`)
         message.channel.setRateLimitPerUser(5)
         tts(message)
     }
     else if(command === 'tts_off'){
         infoMessage(message)
         if(ttsOn === false) return message.channel.send(':x: TTS is alreay off, use `!leave` to disconnect the bot form a channel.')
-        //let ttsChannelname = message.guild.channels.cache.get(ttsChannel)
-        //if(message.channel.id !== ttsChannel) return message.channel.send(`:x: You must run this command in the current TTS channel, ${ttsChannelname}`)
+        let ttsChannelname = message.guild.channels.cache.get(ttsChannel)
+        if(message.channel.id !== ttsChannel) return message.channel.send(`:x: You must run this command in the current TTS channel, ${ttsChannelname}`)
         const connection = getVoiceConnection(message.guild.id);
         if(connection) {
           // Disconnect from the voice channel

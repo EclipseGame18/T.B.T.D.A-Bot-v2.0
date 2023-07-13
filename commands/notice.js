@@ -35,7 +35,7 @@ module.exports = {
         }
             }
             else if(choice === 'changelog'){
-              return('**CHANGELOG:** T.B.T.D.A v2.0 pre 2.8\n```\n-New image generation commands, try over 30 different image generation commands!\n-Final touch-ups\n-New /feedback command (any feedback is accepted and immeadetaly forwarded to the developers DM)\n-Log channel is now seperate from welcome channel (all welcome messages go to a specified welcome channel, logs go to a log channel)\n-Finishing porting over all the commands from the original T.B.T.D.A v1.0\n```')
+              return('**CHANGELOG:** T.B.T.D.A v2.0 pre 2.8.5\n```\n-New image generation commands, try over 30 different image generation commands!\n-Finally finished a full /help command\n-New /feedback command (any feedback is accepted and immeadetaly forwarded to the developers DM)\n-Log channel is now seperate from welcome channel (all welcome messages go to a specified welcome channel, logs go to a log channel)\n-Finishing porting over all the commands from the original T.B.T.D.A v1.0\n```')
             }
             else{
               return(`Please enter either \`notice\` for the latest notice from the developers, or \`changelog\` for the latest T.B.T.D.A changelog.`)

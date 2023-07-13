@@ -5,7 +5,7 @@ const GuildWelcomeChannel = require('../Guild4')
 module.exports = {
   // command options
   description: "Input the channel ID ot be used as a welcome channel. Leave blank to disable",
-  catagory: 'Utility Commands',
+  catagory: 'Mod/Admin Commands',
   aliases: ['welcome_channel'],
   maxArgs: 30,
   expectedArgs: "[channel ID]",

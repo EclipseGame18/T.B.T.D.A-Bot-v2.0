@@ -1,5 +1,5 @@
 const { CommandType } = require("wokcommands");
-const { PermissionsBitField, EmbedBuilder } = require('discord.js')
+const { PermissionsBitField, EmbedBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle } = require('discord.js')
 const GuildWelcomeChannel = require('../Guild7')
 
 module.exports = {
@@ -65,8 +65,6 @@ module.exports = {
             )
             .setTimestamp()
             .setColor('#E01212')
-
-        tokick.send({ embeds: [userwarn] })
 			
 			if (tokick.kickable) {
                 let canLog
@@ -87,25 +85,62 @@ module.exports = {
 					.setColor('#E01212')
                     .setTimestamp()
 
-                    if(canLog === true){
-                        try{
-                            guild.channels.cache.get(guildLog.channel).send({embeds: [x]})
-                            }catch{
-                                return 'There was an error sending the log to the log channel, try checking if the channel ID is correct.'
+                        const next = new ButtonBuilder()
+                        .setCustomId('next')
+                        .setLabel('Confirm')
+                        .setStyle(ButtonStyle.Danger)
+            
+                        const preveous = new ButtonBuilder()
+                        .setCustomId('preveous')
+                        .setLabel('Cancel')
+                        .setStyle(ButtonStyle.Primary)
+            
+                        const buttons = new ActionRowBuilder()
+                        .addComponents(preveous, next)
+            
+                    let msgSend
+            
+                    if(interaction){
+                        msgSend = await interaction.reply({ content: `Are you sure you want to kick ${tokick} for reason: \`${reason}\`?`, components: [buttons] })
+                    }
+                    if(message){
+                        msgSend = await message.reply({ content: `Are you sure you want to kick ${tokick} for reason: \`${reason}\`?`, components: [buttons] })
+                    }
+                    const collector = await msgSend.createMessageComponentCollector();
+            
+                    collector.on('collect', async i =>{
+                        if(i.customId === 'next'){
+                            if(i.user.id !== member.id){
+                                return i.reply({ content: `This option is locked to ${member}`, ephemeral: true })
                             }
+                            next.setDisabled(true)
+                            preveous.setDisabled(true)
+                            await i.update({ embeds: [x], components: [buttons]})
+                            tokick.send({ embeds: [userwarn] })
+                            //tokick.kick(reason).catch(error =>{
+                                //console.log(`Failed to kick ${tokick.displayName} in ${guild.name}: ${error}`)
+                               // return `:x: Error: I was unable to kick the member due to an unknown error. :shrug:`
+                            //});
+                            if(canLog === true){
+                                try{
+                                    guild.channels.cache.get(guildLog.channel).send({embeds: [x]})
+                                    }catch{
+                                        return 'There was an error sending the log to the log channel, try checking if the channel ID is correct.'
+                                    }
+                                }
+                        
+                            
                         }
-
-                if(message){
-				message.channel.send({embeds: [x]});
-                }
-                if(interaction){
-                    interaction.reply({embeds: [x]});
-                }
+                        if(i.customId === 'preveous'){
+                            if(i.user.id !== member.id){
+                                return i.reply({ content: `This option is locked to ${member}`, ephemeral: true })
+                            }
+                            next.setDisabled(true);
+                            preveous.setDisabled(true);
+                            await i.update({ content: 'Kick successfully aborted.', components: [buttons]})
+                        }
+                    })
 				
-				tokick.kick(reason).catch(error =>{
-				console.log(`Failed to kick ${tokick.displayName} in ${guild.name}: ${error}`)
-			    return `:x: Error: I was unable to kick the member due to an unknown error. :shrug:`
-			});
 			}
 
 },

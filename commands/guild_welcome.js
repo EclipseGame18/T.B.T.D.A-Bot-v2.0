@@ -5,7 +5,7 @@ const GuildWelcome = require('../Guild3')
 module.exports = {
   // command options
   description: "Sets the welcome message for your server. Leave blank to disable. Use {member} for users username",
-  catagory: 'Utility Commands',
+  catagory: 'Mod/Admin Commands',
   maxArgs: 100,
   expectedArgs: "[message]",
   guildOnly: true,
