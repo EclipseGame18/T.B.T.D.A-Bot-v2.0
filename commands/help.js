@@ -1,5 +1,5 @@
 const { CommandType, Command } = require("wokcommands");
-const { PermissionsBitField, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder } = require('discord.js')
+const { PermissionsBitField, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ApplicationCommandOptionType } = require('discord.js')
 const GuildPrefix = require('../Guild')
 const GlobalPrefix = '!'
 const version = '2.0 pre 2.8.5'
@@ -10,19 +10,37 @@ module.exports = {
   catagory: 'Utility Commands',
   aliases: ['infomation', 'info'],
   maxArgs: 1,
-  expectedArgs: "[Catagory selector]",
+  expectedArgs: "<Catagory-selector>",
   guildOnly: false,
+  options: [
+    {
+        name: 'catagory-selector',
+        description: 'Select a command catagory to view commands',
+        type: ApplicationCommandOptionType.String,
+        required: false,
+        autocomplete: true
+    }
+  ],
+  autocomplete: (command, argument, interaction) => {
+    return ["utility", "fun", "moderation", "music", "economy", "image", "introduction"];
+  },
   
   // Create a legacy and slash command
-  type: CommandType.SLASH,
+  type: CommandType.BOTH,
 
   // Invoked when a user runs the ping command
   callback: async ({ message, client, channel, interaction, options, args, guild, user, member }) => {
+    let getGuildPrefix
+    if(guild){
     const guildPrefix = await GuildPrefix.findOne({_id: guild.id}).catch(error => {
         console.log(`There was an error: ${error}`)
       })
-      let prefix = guildPrefix.prefix || GlobalPrefix
-    if(!args[0]){
+      getGuildPrefix = guildPrefix.prefix
+    }else{
+        getGuildPrefix = GlobalPrefix
+    }
+      let prefix = getGuildPrefix || GlobalPrefix
+    if(!args[0] || args[0] === 'introduction'){
         const noArgs = new EmbedBuilder()
         .setTitle('T.B.T.D.A\'s help menu selector')
         .setDescription(`This is T.B.T.D.A's help menu selector, here you can select which menu you want to view.\nFor Utility commands, use \`/help utility\`.\nFor Fun commands, use \`/help fun\`.\nFor Mod/Admin commands, use \`/help moderation\`.\nFor Music commands, use \`/help music\`.\nFor Economy commands, use \`/help economy\`.\nFor Image Generation commands, use \`/help image\`.`)
@@ -218,7 +236,9 @@ module.exports = {
             .addComponents(preveous, next)
 
         preveous.setDisabled(true)
-        const msgSend = await interaction.reply({ embeds: [eco], components: [buttons] })
+        let msgSend
+        if(interaction) msgSend = await interaction.reply({ embeds: [eco], components: [buttons] })
+        if(message) msgSend = await message.channel.send({ embeds: [eco], components: [buttons] })
         const collector = await msgSend.createMessageComponentCollector();
 
         collector.on('collect', async i =>{
@@ -305,12 +325,14 @@ module.exports = {
         .addComponents(preveous, next)
 
             preveous.setDisabled(true)
-            const msgSend = await interaction.reply({ embeds: [img], components: [buttons] })
+            let msgSend
+            if(interaction) msgSend = await interaction.reply({ embeds: [img], components: [buttons] })
+            if(message) msgSend = await message.channel.send({ embeds: [img], components: [buttons] })
             const collector = await msgSend.createMessageComponentCollector();
 
         collector.on('collect', async i =>{
             if(i.customId === 'next'){
-                if(i.user.id !== interaction.user.id){
+                if(i.user.id !== member.id){
                     return i.reply({ content: `This help menu is locked to ${member}`, ephemeral: true })
                 }
                 preveous.setDisabled(false)
@@ -319,7 +341,7 @@ module.exports = {
                 
             }
             if(i.customId === 'preveous'){
-                if(i.user.id !== interaction.user.id){
+                if(i.user.id !== member.id){
                     return i.reply({ content: `This help menu is locked to ${member}`, ephemeral: true })
                 }
                 preveous.setDisabled(true)
