@@ -642,7 +642,7 @@ if (message.mentions.has(client.user.id)) {
     }
 
     args[0];
-    if(command == 'play'){
+    if(command === 'play' || command === 'p'){
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         infoMessage(message)
         if (!message.member.voice.channel) {
@@ -667,7 +667,7 @@ if (message.mentions.has(client.user.id)) {
 
         });
     }
-    else if(command == 'playlist'){
+    else if(command === 'playlist' || command === 'pl'){
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         infoMessage(message)
         if (!message.member.voice.channel) {
@@ -691,7 +691,7 @@ if (message.mentions.has(client.user.id)) {
                 message.channel.send(':x: There was either a error playing the playlist or there was no playlist matching the query. Please try that query later.')
         });
     }
-    else if(command == 'skip'){
+    else if(command === 'skip' || command === 's'){
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         infoMessage(message)
         try{
