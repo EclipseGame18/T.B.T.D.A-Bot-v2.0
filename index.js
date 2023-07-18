@@ -1,4 +1,4 @@
-const { Client, Events, GatewayIntentBits, Partials, messageLink, Message, EmbedBuilder, ActivityType, PermissionsBitField, DMChannel } = require ('discord.js');
+const { Client, Events, GatewayIntentBits, Partials, messageLink, Message, EmbedBuilder, ActivityType, PermissionsBitField, DMChannel, Status } = require ('discord.js');
 
 const {AudioPlayer, createAudioResource, StreamType, entersState, VoiceConnectionStatus, joinVoiceChannel, getVoiceConnection, AudioPlayerStatus} = require('@discordjs/voice');
 
@@ -11,6 +11,8 @@ const Economy = require('discord-economy-super/mongodb')
 const {CommandCooldown, msToMinutes} = require('discord-command-cooldown');
 
 const ms = require('ms')
+
+const lockDown = true
 
 const stealCooldown = new CommandCooldown('steal', ms('10m'))
 const begCooldown = new CommandCooldown('beg', ms('5m'))
@@ -195,12 +197,11 @@ process.on("unhandledRejection", error => console.log(`There was an unhandled re
 
 client.on('ready', async() => {
     console.log(`Logged in as ${client.user.tag}`)
-
+    client.user.setStatus('idle');
     client.user?.setPresence({
-        status: 'online',
         activities: [
             {
-                name: "Version 2.0 pre 2.8.5",
+                name: "Version 2.0 pre 2.9",
                 type: ActivityType.Watching,
             }
         ]
@@ -419,6 +420,10 @@ setInterval(function(){
 
 client.on('messageCreate', async (message) => {
     if(message.author.bot) return;
+    const lockDownEmbed = new EmbedBuilder()
+    .setTitle('T.B.T.D.A Beta Test is retiring')
+    .setDescription(`As you probabely know, T.B.T.D.A Beta Test is retiring. We are now around 1-2 days away form switching back to the original T.B.T.D.A. This means that untill the switch occurs, I (T.B.T.D.A Beta Test) will be unavailable.\n\nIf you still havn't added T.B.T.D.A yet, you can do so with [this link](https://discord.com/api/oauth2/authorize?client_id=712958160620748820&permissions=8&scope=bot).`)
+    .setColor('#0059FF');
     ttsMessageRequirement = message
 
     if(!message.guild) return
@@ -509,6 +514,8 @@ client.on('messageCreate', async (message) => {
     const prefix = serverPrefix || globalPrefix;
     const args = message.content.slice(prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();
+
+    if(lockDown === true && message.content.startsWith(prefix)) return message.channel.send({ embeds: [lockDownEmbed] })
 
     const toggleSware = await ToggleAntiSware.findOne({_id: message.guild.id}).catch(error =>{
 		console.log(`There was a error: ${error}`)
