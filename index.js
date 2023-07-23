@@ -69,7 +69,7 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds,
 
 let eco = new Economy({
     connection: {
-        connectionURI: 'mongodb+srv://Bot_Agent:Minecraft18@bot-settings.miusd.mongodb.net/test?authSource=admin&replicaSet=atlas-udb06o-shard-0&readPreference=primary&ssl=true', // mongodb connection URI
+        connectionURI: process.env.MONGO_PATH, // mongodb connection URI
         collectionName: 'eco-database', // specify if using MongoDB version (optional)
         dbName: 'eco-db', // specify if using MongoDB version (optional)
         mongoClientProperties: {
@@ -200,7 +200,7 @@ client.on('ready', async() => {
         status: 'online',
         activities: [
             {
-                name: "Version 2.0 pre 2.8.5",
+                name: `v2.0 in ${client.guilds.cache.size} servers`,
                 type: ActivityType.Watching,
             }
         ]
@@ -209,7 +209,7 @@ client.on('ready', async() => {
         client,
         commandsDir: path.join(__dirname, 'commands'),
         showWarns: true,
-        mongoUri: 'mongodb+srv://Bot_Agent:Minecraft18@bot-settings.miusd.mongodb.net/test?authSource=admin&replicaSet=atlas-udb06o-shard-0&readPreference=primary&ssl=true',
+        mongoUri: process.env.MONGO_PATH,
         
     })
 })
@@ -405,7 +405,7 @@ let ttsQueue = []
 let ttsPlayerStatus = false
 let ttsMessageRequirement
 let musicOn = false
-let importantMessage = true
+let importantMessage = false
 
 setInterval(function(){ 
     //code goes here that will be run every 2 seconds.
