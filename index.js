@@ -576,7 +576,7 @@ if (message.mentions.has(client.user.id)) {
     message.react('👋')
     const ping = new EmbedBuilder()
     .setTitle(`Hello ${message.author.username}`)
-    .setDescription(`I am ${client.user.username}, I support slash (**/**) commands and also legacy commands. My legacy command prefix is currentaly: **${prefix}**.\nIf you need help please join our [support server.](https://discord.gg/3mkKSGw)`)
+    .setDescription(`I am ${client.user.username}, I support slash (**/**) commands and also legacy commands. My legacy command prefix is currentaly: **${prefix}**.\nIf you need help you can use **/help**, or you can join our [support server](https://discord.gg/3mkKSGw).`)
     .setColor('#00B9FF')
     message.channel.send({embeds: [ping]})
   }
