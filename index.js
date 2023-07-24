@@ -1109,7 +1109,7 @@ if (message.mentions.has(client.user.id)) {
         const monthlyResult = await user.rewards.getMonthly()
 
         if(monthlyResult.claimed){
-            message.channel.send(`Congradulations ${message.author}, you claimed you daily reward of \`${monthlyResult.reward}\` coins!`)
+            message.channel.send(`Congradulations ${message.author}, you claimed you monthly reward of \`${monthlyResult.reward}\` coins!`)
         }
 
         if (!monthlyResult.claimed) {
@@ -1231,7 +1231,7 @@ if (message.mentions.has(client.user.id)) {
         }
 
         message.channel.send(
-            `${message.author}, you claimed your **${weeklyResult.reward}** weekly coins!`
+            `Congradulations ${message.author}, you claimed you weekly reward of \`${weeklyResult.reward}\` coins!`
         )
     }
     else if (command === 'transfer'){
