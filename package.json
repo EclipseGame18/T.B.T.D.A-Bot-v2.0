@@ -3,6 +3,7 @@
   "version": "2.0.15",
   "description": "This is the re-write of T.B.T.D.A The Discord Bot",
   "main": "index.js",
+  "private": true,
   "scripts": {
     "test": "node .",
     "start": "node ."
@@ -42,10 +43,10 @@
     "ytsr": "^3.8.2"
   },
   "overrides": {
-    "discord-music-player": {
       "@discordjs/voice": "^0.16.0",
       "ytdl-core": "^4.11.5",
       "ytsr": "^3.8.2"
-    }
+    
   }
+  
 }
