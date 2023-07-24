@@ -965,7 +965,7 @@ if (message.mentions.has(client.user.id)) {
     else if(command === 'bal' || command === 'balance'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
         infoMessage(message)
-        const [userID] = args[0]
+        const [userID] = args
 
         const member =
             message.mentions.users.first() ||
