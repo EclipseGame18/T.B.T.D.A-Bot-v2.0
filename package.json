@@ -43,10 +43,11 @@
     "ytsr": "^3.8.2"
   },
   "overrides": {
+    "discord-music-player": {
       "@discordjs/voice": "^0.16.0",
       "ytdl-core": "^4.11.5",
       "ytsr": "^3.8.2"
-    
+    }
   }
   
 }

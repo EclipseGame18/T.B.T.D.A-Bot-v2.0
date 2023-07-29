@@ -656,15 +656,16 @@ if (message.mentions.has(client.user.id)) {
                 requestedBy: message.author.username
                 }
         });
+
         await queue.join(message.member.voice.channel);
         musicOn = true
         let song = await queue.play(args.join(' ')).catch(err => {
             console.log(`A DMP error occured: ` + err);
-            message.channel.send('Unable to continue playback, an unknown error occured. :shrug:')
+            message.channel.send(':x: Unable to comply, there was no song found by that query.')
             if(!guildQueue)
                 queue.stop();
-                message.channel.send(':x: There was either a error playing the song or there was no song matching the query.\nPlease try that query again later.')
 
+            return
         });
     }
     else if(command === 'playlist' || command === 'pl'){
