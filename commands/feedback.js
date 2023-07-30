@@ -19,16 +19,16 @@ module.exports = {
 
   // Invoked when a user runs the command
   callback: async ({ message, client, channel, interaction, options, args, text, guild, user, member }) => {
+    if(args[0] === 'unlock' && user.id === '547655594715381760'){
+      await feedbackCooldown.removeUser(user.id)
+      return 'Feedback cooldown overridden'
+    }
     const underCooldown = await feedbackCooldown.getUser(user.id)
         if(underCooldown){
             const time = msToMinutes(underCooldown.msLeft, false)
             return `${user}, you can send feedback again in **${time.hours}** hours, **${time.minutes}** minutes, **${time.seconds}** seconds.`
         }
         if(!args[0]) return 'Please provide some feedback'
-        if(args[0] === 'unlock' && user.id === '547655594715381760'){
-          await feedbackCooldown.removeUser(user.id)
-          return 'Feedback cooldown overridden'
-        }
         let feedback = text
         const developer = client.users.cache.get('547655594715381760')
         
