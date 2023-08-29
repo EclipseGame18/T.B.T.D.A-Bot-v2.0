@@ -39,14 +39,12 @@
     "weather-js": "^2.0.0",
     "wokcommands": "^2.1.9",
     "youtubei": "^1.1.2",
-    "ytdl-core": "npm:@distube/ytdl-core@^4.11.16",
-    "ytsr": "^3.8.2"
+    "ytdl-core": "^4.11.5",
+    "ytsr": "^3.8.4"
   },
   "overrides": {
     "discord-music-player": {
-      "@discordjs/voice": "^0.16.0",
-      "ytdl-core": "npm:@distube/ytdl-core@^4.11.16",
-      "ytsr": "^3.8.2"
+      "@discordjs/voice": "^0.16.0"
     }
   }
 }
