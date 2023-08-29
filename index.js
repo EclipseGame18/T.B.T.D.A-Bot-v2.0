@@ -144,7 +144,7 @@ client.player
 	let initMessage = queue.data.queueInitMessage;
 const embed = new EmbedBuilder()
 .setTitle('Playlist added:') 
-.setDescription(`${playlist.songs.length} songs were added to the queue.`)
+.setDescription(`**${playlist.songs.length}** songs were added to the queue.\nMusic feedback locked to ${initMessage.channel}`)
 .setColor('#6CFFD9');
 await initMessage.channel.send({embeds: [embed]})
 return;
@@ -167,7 +167,7 @@ return;
 	let initMessage = queue.data.queueInitMessage;
 	const playEmbed = new EmbedBuilder()
 .setTitle("Now Playing:")
-.setDescription(`[${song}](${song.url})!`)
+.setDescription(`[${song}](${song.url})!\nMusic feedback locked to ${initMessage.channel}`)
 .setColor('#6CFFD9')
 .setThumbnail(`${song.thumbnail}`)
 await initMessage.channel.send({embeds: [playEmbed]})
@@ -191,7 +191,7 @@ await initMessage.channel.send({embeds: [playEmbed]})
     initMessage.channel.send(`An error occured trying to playback: \`${song}\`. The queue is now cleared.`)
 })
 
-process.on("unhandledRejection", error => console.log(`There was an unhandled rejection error, but it was caught:\n${error}`));
+//process.on("unhandledRejection", error => console.log(`There was an unhandled rejection error, but it was caught:\n${error}`));
 
 client.on('ready', async() => {
     console.log(`Logged in as ${client.user.tag}`)
@@ -846,9 +846,12 @@ if (message.mentions.has(client.user.id)) {
             let requestedBy = initqueue.data.requestedBy
             const rawQueue = guildQueue.songs;
     
-            const queueSongNames = rawQueue.map((element, index) => `${index + 1}) ${element.name} | ${element.author}`);
+            let queueSongNames = rawQueue.map((element, index) => `${index + 1}) ${element.name} | ${element.author}\n\`[${requestedBy}]\``);
+
+            queueSongNames.shift()
+        
     
-            const queue = queueSongNames.join(`\n\`[${requestedBy}]\`\n\n`);
+            let queue = queueSongNames.join(`\n\n`);
             const queueEmbed = new EmbedBuilder()
             .setTitle(`Music queue for ${message.guild.name}:`)
             .setDescription(`Now Playing: [${guildQueue.nowPlaying}](${guildQueue.nowPlaying.url})\n**__Queue:__**\n${queue}`)

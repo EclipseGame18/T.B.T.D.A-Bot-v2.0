@@ -50,7 +50,7 @@ module.exports = {
             {name: 'Want to configure the bot online?', value: `Check out the online [web dashboard](https://tbtda.xyz)`}
         )
         .setColor('#00B9FF')
-        .setFooter({ text: `T.B.T.D.A version: ${version} | Counting 117 total commands!` })
+        .setFooter({ text: `T.B.T.D.A version: ${version} | Counting 118 total commands!` })
         if(message){
             return message.channel.send({ embeds: [noArgs] })
         }
@@ -81,7 +81,8 @@ module.exports = {
             {name: '/setup', value: 'Learn how to setup T.B.T.D.A in your server'},
             {name: '/reset_settings', value: 'Reset allof T.B.T.D.A\'s settings in your guild'},
             {name: '/get_settings', value: 'Get all the current guild settings'},
-            {name: '/notice', value: 'Get either the latest notice form the developers, or the latest T.B.T.D.A changelog'}
+            {name: '/notice', value: 'Get either the latest notice form the developers, or the latest T.B.T.D.A changelog'},
+            {name: '/ping', value: 'Get T.B.T.D.A\'s current ping'}
         )
         .setFooter({ text: `T.B.T.D.A version: ${version} | Current server prefix: ${prefix}` })
         .setColor('#00B9FF')
