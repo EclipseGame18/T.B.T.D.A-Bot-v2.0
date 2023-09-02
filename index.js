@@ -2127,7 +2127,8 @@ if (message.mentions.has(client.user.id)) {
     else if(command === 'tts'){
         infoMessage(message)
         if(!message.member.voice.channel) return message.channel.send(`${message.author}, you myst be in a voice channel to use this command.`)
-        if(musicOn === true) return message.reply(`You must stop music playback before starting TTS, use \`!stop\` to stop music playback.`)
+        if(musicOn === true) return message.reply(`:x: You must stop music playback before starting TTS, use \`!stop\` to stop music playback.`)
+        if(ttsOn === true) return message.reply(":x: TTS is already actave, use !tts_off to turn off TTS.")
         ttsChannel = message.channel.id
         tts_text = "Text to speach is ready, TTS will use the channel the command was ran in as the input channel."
         ttsOn = true

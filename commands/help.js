@@ -50,7 +50,7 @@ module.exports = {
             {name: 'Want to configure the bot online?', value: `Check out the online [web dashboard](https://tbtda.xyz)`}
         )
         .setColor('#00B9FF')
-        .setFooter({ text: `T.B.T.D.A version: ${version} | Counting 118 total commands!` })
+        .setFooter({ text: `T.B.T.D.A version: ${version} | Counting 119 total commands!` })
         if(message){
             return message.channel.send({ embeds: [noArgs] })
         }
@@ -61,7 +61,7 @@ module.exports = {
     if(args[0] === 'utility'){
         const utility = new EmbedBuilder()
         .setTitle('Utility commands')
-        .setDescription(`Here is T.B.T.D.A's 18 utility commands:`)
+        .setDescription(`Here is T.B.T.D.A's 20 utility commands:`)
         .addFields(
             {name: '/clear', value: 'Clears a specified amount of messages form a channel'},
             {name: '/join', value: 'T.B.T.D.A will join the VC you are currentaly in'},
