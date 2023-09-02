@@ -113,6 +113,8 @@ let eco = new Economy({
     },
 })
 
+let newSongMsg
+
 
 const { RepeatMode } = require('discord-music-player');
 const { Player } = require("discord-music-player");
@@ -144,7 +146,7 @@ client.player
 	let initMessage = queue.data.queueInitMessage;
 const embed = new EmbedBuilder()
 .setTitle('Playlist added:') 
-.setDescription(`**${playlist.songs.length}** songs were added to the queue.\nMusic feedback locked to ${initMessage.channel}`)
+.setDescription(`**${playlist.songs.length}** songs were added to the queue.`)
 .setColor('#6CFFD9');
 await initMessage.channel.send({embeds: [embed]})
 return;
@@ -153,12 +155,13 @@ return;
 .on('songChanged', async(queue, newSong, oldSong) =>{
 	let initMessage = queue.data.queueInitMessage;
 	let requestedBy = queue.data.requestedBy
+    if(newSongMsg) newSongMsg.delete()
 	const embed = new EmbedBuilder()
 	.setTitle('New Song:')
 	.setDescription(`\`${oldSong}\` has finished, now playing: [${newSong}](${newSong.url})!`)
 	.setThumbnail(`${newSong.thumbnail}`)
 	.setColor('#6CFFD9');
-	await initMessage.channel.send({embeds: [embed]}).then(msg => {setTimeout(() => msg.delete(), 120000)})
+	newSongMsg = await initMessage.channel.send({embeds: [embed]})  //.then(msg => {setTimeout(() => msg.delete(), 120000)}) (no longer needed, used to wait for 2.30 minuits before deleting message. Now message is deleted and then replaced with a new message)
 	return;
 })
 // Emitted when a first song in the queue started playing.
@@ -415,6 +418,26 @@ setInterval(function(){
         ttsQueue.shift()
     }   
 }, 2000);
+
+// Generate a regex pattern to match whole words with word boundary exceptions
+//function generateRegexPattern(word) {
+    // Escape special characters in the word
+    //const escapedWord = word.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    // Replace asterisks with a regex pattern that allows word boundaries with asterisks
+   // const pattern = `(?<![\\w*])${escapedWord}(?![\\w*])`;
+   // return new RegExp(pattern, 'gi');
+ // }
+
+ const blacklisted = ['fuck', 'fucking', 'f*ck', 'f**k', 'shit', 'sh!t', 's#!t', 'ass', 'cock', 'dick', 'c0ck', 'd1ck', 'nigger', 'n!gger', 'cunt'];
+
+
+ // Create a regular expression pattern to match banned words with variations
+ const bannedWordsPattern = new RegExp(
+    `\\b(?:${blacklisted.map(word =>
+      word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/@/g, '[@]').replace(/#/g, '[#]')
+    ).join('|')})\\b`,
+    'gi'
+  );
     
 
 client.on('messageCreate', async (message) => {
@@ -526,19 +549,16 @@ client.on('messageCreate', async (message) => {
 			})
 	} 
 
-try{
+    try{
 	if (toggleSware.toggle === 'true'){
-		const blacklisted = ['fuck', 'shit', 'ass', 'cock', 'dick', 'c0ck', 'd1ck', 'nigger', 'cunt'];
-		const whitelisted = ['pass', 'mass', 'hass', 'harass']
         if(message.channel.nsfw) return
-		
-		for (var i in blacklisted) {
-			const user = message.author;
-			
-		 	if (message.content.toLowerCase().includes(whitelisted[i])){
-		 		return
-			 
-		 	} else if (message.content.toLowerCase().includes(blacklisted[i].toLowerCase())){
+        if(!message.guild) return
+
+            const content = message.content.toLowerCase();
+
+            if (bannedWordsPattern.test(content)) {
+                msglog = message.content
+                let user = message.author
 				message.delete().catch(error =>{
 					console.log(`Failed to delete blacklisted word sent by ${user.username} in ${message.guild.name}, ID: ${message.guild.id}`)
 					message.channel.send(`:x: Failed to delete message, try checking my permissions.`).then(msg => {setTimeout(() => msg.delete(), 8000)})
@@ -557,19 +577,19 @@ try{
                     .addFields(
                         {name: 'User', value: `${message.author}`},
                         {name: 'Warned by', value: `${client.user} (auto mod)`},
-                        {name: 'Reason', value: `Bad words`}
+                        {name: 'Reason', value: `Bad words in message:\n\`${msglog}\``}
                     )
                     .setTimestamp()
                     .setColor('#FF6400')
 
                     message.guild.channels.cache.get(logChannel.channel).send({embeds: [swear]})
                 }
-		 	}
-		}
-	}
-}catch{
-    console.log(`Error retreving swear status for ${message.guild.name} (${message.guild.id})`)
-}
+             }
+            }
+
+    }catch(err){
+        console.log(`Error retreving swear status for ${message.guild.name} (${message.guild.id}), ${err}`)
+    }
 
 if (message.mentions.has(client.user.id)) {
     if(message.mentions.everyone) return
