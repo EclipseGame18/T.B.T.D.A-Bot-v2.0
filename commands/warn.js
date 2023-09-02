@@ -4,7 +4,7 @@ const GuildWelcomeChannel = require('../Guild7')
 
 module.exports = {
   // command options
-  description: "Warns a user in yout guild.",
+  description: "Warns a user in your guild.",
   catagory: 'Mod/Admin Commands',
   minArgs: 2,
   expectedArgs: "<user> <reason>",

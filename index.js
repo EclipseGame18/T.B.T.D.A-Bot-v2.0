@@ -10,6 +10,21 @@ const Economy = require('discord-economy-super/mongodb')
 
 const {CommandCooldown, msToMinutes} = require('discord-command-cooldown');
 
+const sqlite3 = require('sqlite3').verbose();
+
+// Connect to the SQLite database
+const db = new sqlite3.Database('offenses.db');
+
+// Initialize the database table
+db.run(`
+  CREATE TABLE IF NOT EXISTS offenses (
+    guild_id TEXT,
+    user_id TEXT,
+    username TEXT,
+    offense_count INTEGER
+  )
+`);
+
 const ms = require('ms')
 
 const stealCooldown = new CommandCooldown('steal', ms('10m'))
@@ -438,6 +453,25 @@ setInterval(function(){
     ).join('|')})\\b`,
     'gi'
   );
+
+  // Function to get the offense count for a specific user in a guild
+function getOffenseCount(guildId, userId, callback) {
+    db.get('SELECT offense_count FROM offenses WHERE guild_id = ? AND user_id = ?', [guildId, userId], (err, row) => {
+      if (err) {
+        console.error(`Error querying database: ${err}`);
+        callback(err, null);
+        return;
+      }
+  
+      if (row) {
+        callback(null, row.offense_count);
+      } else {
+        // If the user is not found, return 0 offenses
+        callback(null, 0);
+      }
+    });
+  }
+  
     
 
 client.on('messageCreate', async (message) => {
@@ -556,13 +590,48 @@ client.on('messageCreate', async (message) => {
 
             const content = message.content.toLowerCase();
 
+             // Reset the lastIndex property of the regular expression to ensure it starts from the beginning
+            bannedWordsPattern.lastIndex = 0;
+
             if (bannedWordsPattern.test(content)) {
                 msglog = message.content
                 let user = message.author
-				message.delete().catch(error =>{
-					console.log(`Failed to delete blacklisted word sent by ${user.username} in ${message.guild.name}, ID: ${message.guild.id}`)
+                const guildId = message.guild.id;
+                const userId = message.author.id;
+                const username = message.author.username;
+
+                    // Retrieve the user's existing offense count from the database
+                db.get('SELECT offense_count FROM offenses WHERE guild_id = ? AND user_id = ?', [guildId, userId], (err, row) => {
+                    if (err) {
+                    console.error(`Error querying swear offence database: ${err}`);
+                    return;
+                    }
+            
+                    let currentOffenses = 1;
+            
+                    if (row) {
+                    currentOffenses = row.offense_count + 1;
+            
+                    // Update the user's offense count in the database
+                    db.run('UPDATE offenses SET offense_count = ? WHERE guild_id = ? AND user_id = ?', [currentOffenses, guildId, userId], (err) => {
+                        if (err) {
+                        console.error(`Error updating offence database: ${err}`);
+                        }
+                    });
+                    } else {
+                    // Insert a new entry for the user in the database
+                    db.run('INSERT INTO offenses (guild_id, user_id, username, offense_count) VALUES (?, ?, ?, ?)', [guildId, userId, username, currentOffenses], (err) => {
+                        if (err) {
+                        console.error(`Error inserting into offence database: ${err}`);
+                        }
+                    });
+                    }})
+            
+				 message.delete().catch(error =>{
+					console.log(`Failed to delete blacklisted word sent by ${user.username} in ${message.guild.name}, ID: ${message.guild.id}. ERROR: ${error}`)
 					message.channel.send(`:x: Failed to delete message, try checking my permissions.`).then(msg => {setTimeout(() => msg.delete(), 8000)})
 				});
+
 				message.channel.send(`${user}, Please don't use that language here!`).then(msg => {setTimeout(() => msg.delete(), 8000)})
                 let canLog
                 if(logChannel.channel !== ''){
@@ -572,23 +641,33 @@ client.on('messageCreate', async (message) => {
                 }
 
                 if(canLog === true){
-                    const swear = new EmbedBuilder()
-                    .setTitle('User Warned')
-                    .addFields(
-                        {name: 'User', value: `${message.author}`},
-                        {name: 'Warned by', value: `${client.user} (auto mod)`},
-                        {name: 'Reason', value: `Bad words in message:\n\`${msglog}\``}
-                    )
-                    .setTimestamp()
-                    .setColor('#FF6400')
-
-                    message.guild.channels.cache.get(logChannel.channel).send({embeds: [swear]})
+                    getOffenseCount(message.guild.id, message.member.id, (err, offenseCount) => {
+                        if (err) {
+                          console.error('Error:', err);
+                        } else {
+                            const swear = new EmbedBuilder()
+                            .setTitle('User Warned')
+                            .addFields(
+                                {name: 'User', value: `${message.author}`},
+                                {name: 'Warned by', value: `${client.user} (auto mod)`},
+                                {name: 'Reason', value: `Bad words in message:\n\`${msglog}\``},
+                                {name: 'Number of offences', value: `${offenseCount} offence(s) in 24 hours`}
+                            )
+                            .setTimestamp()
+                            .setColor('#FF6400')
+        
+                            message.guild.channels.cache.get(logChannel.channel).send({embeds: [swear]}).catch(error =>{
+                                console.log(`There was an error while trying to log blacklist word offence in ${message.guild.name} (${message.guild.id}). ERROR: ${error}`)
+                            })
+                        }
+                      });
                 }
+                return
              }
             }
 
     }catch(err){
-        console.log(`Error retreving swear status for ${message.guild.name} (${message.guild.id}), ${err}`)
+        console.log(`There was an error while trying to log blacklist word offence in ${message.guild.name} (${message.guild.id}), ${err}`)
     }
 
 if (message.mentions.has(client.user.id)) {
