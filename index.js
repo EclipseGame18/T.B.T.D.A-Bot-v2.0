@@ -13,7 +13,7 @@ const {CommandCooldown, msToMinutes} = require('discord-command-cooldown');
 const sqlite3 = require('sqlite3').verbose();
 
 // Connect to the SQLite database
-const db = new sqlite3.Database('offenses.db');
+const db = new sqlite3.Database('usr-data-temp.db');
 
 // Initialize the database table
 db.run(`
@@ -23,7 +23,22 @@ db.run(`
     username TEXT,
     offense_count INTEGER
   )
+`)
+console.log("Offences database ready for use.")
+
+db.run(`
+  CREATE TABLE IF NOT EXISTS command_counts (
+    guild_id TEXT,
+    user_id TEXT,
+    command_count INTEGER,
+    PRIMARY KEY (guild_id, user_id)
+  )
 `);
+console.log("Command count database ready for use.")
+
+module.exports = {
+    db,
+};
 
 const ms = require('ms')
 
@@ -71,7 +86,8 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds,
                                       GatewayIntentBits.GuildMembers,
                                       GatewayIntentBits.GuildVoiceStates,
                                       GatewayIntentBits.GuildModeration,
-                                      GatewayIntentBits.DirectMessages
+                                      GatewayIntentBits.DirectMessages,
+                                      GatewayIntentBits.GuildPresences
                                      ],
                                      partials: [
                                         Partials.Channel,
@@ -218,7 +234,7 @@ client.on('ready', async() => {
         status: 'online',
         activities: [
             {
-                name: `v2.0 in ${client.guilds.cache.size} servers`,
+                name: `v2.1 in ${client.guilds.cache.size} servers`,
                 type: ActivityType.Watching,
             }
         ]
@@ -471,6 +487,43 @@ function getOffenseCount(guildId, userId, callback) {
       }
     });
   }
+
+  function incrementCommandCount(guildId, userId, callback) {
+    db.run('INSERT OR IGNORE INTO command_counts (guild_id, user_id, command_count) VALUES (?, ?, 0)', [guildId, userId], (err) => {
+      if (err) {
+        console.error(`Error inserting into database: ${err}`);
+        callback(err);
+        return;
+      }
+  
+      db.run('UPDATE command_counts SET command_count = command_count + 1 WHERE guild_id = ? AND user_id = ?', [guildId, userId], (err) => {
+        if (err) {
+          console.error(`Error updating database: ${err}`);
+          callback(err);
+          return;
+        }
+  
+        callback(null);
+      });
+    });
+  }
+
+  function getCommandCount(guildId, userId, callback) {
+    db.get('SELECT command_count FROM command_counts WHERE guild_id = ? AND user_id = ?', [guildId, userId], (err, row) => {
+      if (err) {
+        console.error(`Error querying database: ${err}`);
+        callback(err, null);
+        return;
+      }
+  
+      if (row) {
+        callback(null, row.command_count);
+      } else {
+        // If the user is not found, return 0 commands
+        callback(null, 0);
+      }
+    });
+  }
   
     
 
@@ -479,6 +532,7 @@ client.on('messageCreate', async (message) => {
     ttsMessageRequirement = message
 
     if(!message.guild) return
+
 
     const welcomemessagechannel = await GuildWelcomeChannel.findOne({_id: message.guild.id}).catch(error =>{
         console.log(`There was a error: ${error}`)
@@ -641,6 +695,7 @@ client.on('messageCreate', async (message) => {
                 }
 
                 if(canLog === true){
+                    setTimeout(async () => {
                     getOffenseCount(message.guild.id, message.member.id, (err, offenseCount) => {
                         if (err) {
                           console.error('Error:', err);
@@ -661,6 +716,7 @@ client.on('messageCreate', async (message) => {
                             })
                         }
                       });
+                    }, 2000);
                 }
                 return
              }
@@ -681,7 +737,17 @@ if (message.mentions.has(client.user.id)) {
   }
 
 
+
+
     if(!message.content.startsWith(prefix)) return;
+
+  //add 1 to the users command usage count
+    incrementCommandCount(message.guild.id, message.member.id, (err) => {
+        if (err) {
+          console.error('Error:', err);
+        }
+    });
+
     const guildQueue = client.player.getQueue(message.guild.id);
 
     let guild = eco.cache.guilds.get({
@@ -2257,6 +2323,18 @@ if (message.mentions.has(client.user.id)) {
         }
     }
 })
+
+client.on('interactionCreate', (interaction) => {
+    if (!interaction.isCommand()) return; // Ignore non-command interactions
+
+    //add 1 to the users command usage count
+      incrementCommandCount(interaction.guild.id, interaction.user.id, (err) => {
+        if (err) {
+          console.error('Error incrementing command count:', err);
+        }
+      });
+    
+});
 
 async function tts(message){
     if(tts_text.length > 200){

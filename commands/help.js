@@ -2,7 +2,7 @@ const { CommandType, Command } = require("wokcommands");
 const { PermissionsBitField, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ApplicationCommandOptionType } = require('discord.js')
 const GuildPrefix = require('../Guild')
 const GlobalPrefix = '!'
-const version = '2.0'
+const version = '2.1'
 
 module.exports = {
   // command options
@@ -50,7 +50,7 @@ module.exports = {
             {name: 'Want to configure the bot online?', value: `Check out the online [web dashboard](https://tbtda.xyz)`}
         )
         .setColor('#00B9FF')
-        .setFooter({ text: `T.B.T.D.A version: ${version} | Counting 119 total commands!` })
+        .setFooter({ text: `T.B.T.D.A version: ${version} | Counting 120 total commands!` })
         if(message){
             return message.channel.send({ embeds: [noArgs] })
         }
@@ -61,7 +61,7 @@ module.exports = {
     if(args[0] === 'utility'){
         const utility = new EmbedBuilder()
         .setTitle('Utility commands')
-        .setDescription(`Here is T.B.T.D.A's 20 utility commands:`)
+        .setDescription(`Here is T.B.T.D.A's 20 utility commands: ([L] = legacy command only)`)
         .addFields(
             {name: '/clear', value: 'Clears a specified amount of messages form a channel'},
             {name: '/join', value: 'T.B.T.D.A will join the VC you are currentaly in'},
@@ -70,8 +70,8 @@ module.exports = {
             {name: '/test_log', value: 'Test the log and welcome channels you specify'},
             {name: '/weather', value: 'Get the current weather for your specified location'},
             {name: '/feedback', value: 'Give feedback to the developers about bugs, improvements, ect.'},
-            {name: `${prefix}tts`, value: `T.B.T.D.A will join your VC and read all messages form the channel where the ${prefix}tts command was origionaly ran`},
-            {name: `${prefix}tts_off`, value: 'Disables TTS and disconnects T.B.T.D.A form your VC'},
+            {name: `[L] ${prefix}tts`, value: `T.B.T.D.A will join your VC and read all messages form the channel where the ${prefix}tts command was origionaly ran`},
+            {name: `[L] ${prefix}tts_off`, value: 'Disables TTS and disconnects T.B.T.D.A form your VC'},
             {name: '/toggleCommand', value: 'Disable any slash command in your guild (does not apply to some legacy commands)'},
             {name: '/requiredRole', value: 'Allows for server admins to configure which slash commands require roles, however, most commands already check for user permissions before executing'},
             {name: '/prefix', value: 'Allows for server admins to configure custom server legacy command prefixes, the defult prefix is **!**'},
@@ -117,7 +117,7 @@ module.exports = {
     else if(args[0] === 'moderation'){
         const mod = new EmbedBuilder()
         .setTitle('Mod/Admin commands')
-        .setDescription(`Here is T.B.T.D.A's 11 moderation commands. Please keep in mind that these commands do require the user to have special permissions in order to execute.`)
+        .setDescription(`Here is T.B.T.D.A's 12 moderation commands. Please keep in mind that these commands do require the user to have special permissions in order to execute.`)
         .addFields(
             {name: '/log', value: 'Send a log to the servers log channel'},
             {name: '/warn', value: 'Warn a user'},
@@ -130,6 +130,7 @@ module.exports = {
             {name: '/toggle_image', value: 'Toggle the image generation plugin on or off'},
             {name: '/toggle_music', value: 'Toggle the music plugin on or off'},
             {name: '/toggle_swear', value: 'Toggle the guild anti-swear plugin on or off'},
+            {name: '/member_info', value: 'Get infomation on any member in your guild'}
         )
         .setFooter({ text: `T.B.T.D.A version: ${version} | Current server prefix: ${prefix}` })
         .setColor('#00B9FF')

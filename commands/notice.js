@@ -35,7 +35,7 @@ module.exports = {
         }
             }
             else if(choice === 'changelog'){
-              return('**CHANGELOG:** T.B.T.D.A v2.0\n```\n-Fully changed over to T.B.T.D.A Version 2.0\n-Bug fixes\n-Music module currentaly univalable (fix soon)\n-Grammer fixes\n-Retired T.B.T.D.A Beta Test\n```')
+              return('**CHANGELOG:** T.B.T.D.A v2.1\n```\n-Added /member_info and /ping commands\n-Lots of bug fixes\n-Music module working again\n-Added more minor features (quality of life features)\n```')
             }
             else{
               return(`Please enter either \`notice\` for the latest notice from the developers, or \`changelog\` for the latest T.B.T.D.A changelog.`)
