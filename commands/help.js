@@ -50,7 +50,7 @@ module.exports = {
             {name: 'Want to configure the bot online?', value: `Check out the online [web dashboard](https://tbtda.xyz)`}
         )
         .setColor('#00B9FF')
-        .setFooter({ text: `T.B.T.D.A version: ${version} | Counting 120 total commands!` })
+        .setFooter({ text: `T.B.T.D.A version: ${version} | Counting 122 total commands!` })
         if(message){
             return message.channel.send({ embeds: [noArgs] })
         }
@@ -97,13 +97,15 @@ module.exports = {
     else if(args[0] === 'fun'){
         const fun = new EmbedBuilder()
         .setTitle('Fun commands')
-        .setDescription(`Here is T.B.T.D.A's 5 fun commands:`)
+        .setDescription(`Here is T.B.T.D.A's 7 fun commands:`)
         .addFields(
             {name: '/8ball', value: 'Ask the 8ball a question, and get the answer you have been waiting for'},
             {name: '/flip', value: 'Flip a coin'},
             {name: '/hi', value: 'Says \'hi\' back'},
             {name: '/roll', value: 'Roll a dice up to a maxmum of 24 sides'},
             {name: '/rps', value: 'Play rock, paper, scissors with T.B.T.D.A'},
+            {name: '/random_colour', value: 'Generates a random color and displays the HEX and RGB values'},
+            {name: '/get_avatar', value: 'Get a user\'s avatar'}
         )
         .setFooter({ text: `T.B.T.D.A version: ${version} | Current server prefix: ${prefix}` })
         .setColor('#00B9FF')

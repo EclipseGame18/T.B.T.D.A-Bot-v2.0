@@ -94,6 +94,7 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds,
                                         Partials.User,
                                         Partials.Message,
                                         Partials.GuildMember,
+                                        Partials.Reaction
                                     ],
                         });
 
@@ -398,17 +399,22 @@ client.on("guildCreate", async (guild) => {
                             logchannelcheck = '(nothing)'
                         }
 	setTimeout(async () => {
+    
     /*
-    const channels = await guild.channels.fetch()
-    const textChannels = channels.filter(channel => channel.type === 'GUILD_TEXT');
+    // Fetch the guild's channels
+    const channels = await guild.channels.fetch();
+
+    // Find the first text channel
+    const textChannel = channels.find((channel) => channel.type === 'GUILD_TEXT');
+
     // This event triggers when the bot joins a guild.    
     console.log(`Joined new guild: ${guild.name} with ${guild.memberCount} users!`);
 	const join = new EmbedBuilder()
         .setTitle(`Hello ${guild.name}! :wave:`)
         .setDescription(`Thanks for adding me! My name is **${client.user.username}** and I am happy to be here!`)
         .addFields(
-            { name: 'First things first', value: 'My defult prefix is **>** and you can change it by either going to https://tbtda.cf or using the >setprefix command.' },
-            { name: 'Commands and command usage', value: `Most of my commands only require one arguement e.g. the /play command which can be used like this: \`/play {song name}\` and the >clear command which is used like this: \`/clear {number}\`. But don't worry you will get the hang of it in no time! :)` },
+            { name: 'First things first', value: 'My defult prefix is **!** and you can change it by either going to https://tbtda.xyz or using the >setprefix command. I also support slash (/) commands.' },
+            { name: 'Commands and command usage', value: `Most of my commands only require one arguement e.g. the !play command which can be used like this: \`!play {song name}\` and the /clear command which is used like this: \`/clear {number}\`. But don't worry you will get the hang of it in no time! :)` },
             { name: 'Plugins', value: `I also come with some plugins. One of my most useful plugins is the Anti-Swear plugin, this plugin will moderate your chat even when your admins and mods are offline! (this can be turned on and off using the \`/toggle_swear\` command)` },
             { name: 'Errors/Bugs', value: `Now, while using the bot you may encounter errors or bugs. But don't worry because there is a [Google Form](https://forms.gle/s3nUpZ3Dro8JNBDj8) setup so that you can report any bugs you find.` },
             { name: 'General help', value: `If you have any questions or need help there is a [Discord Server](https://discord.gg/3mkKSGw) with people that will be happy to help you!` }
@@ -416,14 +422,13 @@ client.on("guildCreate", async (guild) => {
         .setColor('#35F01F')
         
         
-            const textChannel = textChannels.values().next().value;
-            console.log(`${textChannel}`)
+
             
-    //try{
-	//await textChannel.send({ embeds: [join]});
-    //} catch{
-        //console.log(`Unable to send welcome message in ${guild.name}`)
-    //}
+    try{
+	    await textChannel.send({ embeds: [join]});
+    } catch (err){
+        console.log(`Unable to send welcome message in ${guild.name} (${guild.id}) ERROR: ${err}`)
+    }
     */
     console.log(`Joined ${guild.name} with ${guild.memberCount} users. ID: ${guild.id}\nAnti-swear: ${toggleSware.toggle}.\nWelcome message: ${guildwelcometoggle}.\nwelcome channel: ${welcomemessageschanneltoggle}.\nLog channel: ${logchannelcheck}\nMusic toggle: ${toggleMusic.toggle}.\nEco toggle: ${toggleEco.toggle}.\nImage toggle: ${toggleImg.toggle}`)
     }, 2000);
@@ -730,7 +735,7 @@ if (message.mentions.has(client.user.id)) {
     if(message.mentions.everyone) return
     message.react('👋')
     const ping = new EmbedBuilder()
-    .setTitle(`Hello ${message.author.username}`)
+    .setTitle(`Hello ${message.author.username}!`)
     .setDescription(`I am ${client.user.username}, I support slash (**/**) commands and also legacy commands. My legacy command prefix is currentaly: **${prefix}**.\nIf you need help you can use **/help**, or you can join our [support server](https://discord.gg/3mkKSGw).`)
     .setColor('#00B9FF')
     message.channel.send({embeds: [ping]})
