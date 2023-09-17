@@ -4,14 +4,14 @@ const {CommandCooldown, msToMinutes} = require('discord-command-cooldown');
 
 const ms = require('ms')
 
-const feedbackCooldown = new CommandCooldown('feedback', ms('2h'))
+const feedbackCooldown = new CommandCooldown('feedback', ms('90m'))
 
 module.exports = {
   // command options
   description: "Sends feedback to the developer.",
   catagory: 'Utility Commands',
   minArgs: 1,
-  expectedArgs: "[feedback]",
+  expectedArgs: "<feedback>",
   guildOnly: false,
   
   // Create a legacy and slash command
@@ -40,6 +40,6 @@ module.exports = {
 
         developer.send({ embeds: [feedbackembed] })
         await feedbackCooldown.addUser(user.id)
-        return 'Your feedback has been sent to the developers!\nThank you in taking time to write to us!'
+        return `Your feedback; \`${feedback}\`, has been sent to the developers!\nThank you in taking time to write to us :smile:`
   },
 }

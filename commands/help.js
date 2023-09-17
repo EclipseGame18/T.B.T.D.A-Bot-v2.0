@@ -46,8 +46,10 @@ module.exports = {
         .setDescription(`This is T.B.T.D.A's help menu selector, here you can select which menu you want to view.\nFor Utility commands, use \`/help utility\`.\nFor Fun commands, use \`/help fun\`.\nFor Mod/Admin commands, use \`/help moderation\`.\nFor Music commands, use \`/help music\`.\nFor Economy commands, use \`/help economy\`.\nFor Image Generation commands, use \`/help image\`.`)
         .addFields(
             {name: 'What prefix do I use?', value: `T.B.T.D.A supports slash (**/**) and legacy commands. The defult legacy command prefix is **!**, but this can be changed with \`/prefix {new prefix}\`. The current guild prefix is: **${prefix}**`},
-            {name: 'Need more help?', value: `Join our Discord [support server](https://discord.gg/3mkKSGw)`},
-            {name: 'Want to configure the bot online?', value: `Check out the online [web dashboard](https://tbtda.xyz)`}
+            {name: 'Need more help?', value: `If you require more help, you can join our Discord [support server](https://discord.gg/3mkKSGw)`},
+            {name: 'Want to configure the bot online?', value: `Check out the online [web dashboard](https://tbtda.xyz) to configure and setup the bot to suit your needs`},
+            {name: 'Need to contact us?', value: `You can contact us either via the [support server](https://discord.gg/3mkKSGw), or you can email us directaly at support@tbtda.xyz`},
+            {name: 'Got some feedback?', value: `You can submit feedback through the /feedback command`}
         )
         .setColor('#00B9FF')
         .setFooter({ text: `T.B.T.D.A version: ${version} | Counting 122 total commands!` })

@@ -9,7 +9,7 @@ module.exports = {
   aliases: ['swear'],
   minArgs: 1,
   maxArgs: 1,
-  expectedArgs: "[toggle on or off]",
+  expectedArgs: "<toggle on or off>",
   guildOnly: true,
   
   // Create a legacy and slash command
