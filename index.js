@@ -1720,7 +1720,7 @@ if (message.mentions.has(client.user.id)) {
                 .map((item, index) =>
                     `${index + 1} - ${item.custom.locked ? ' 🔒 | ' : ' '}${item.custom.emoji} ` +
                     `**${item.name}** (ID: \`${item.id}\`) - \`${item.price}\` coins\n` +
-                    `Description: \`${item.description}\`. Max amount in inventory: \`${item.maxAmount}\`.`
+                    `Description: \`${item.description}\`. Max amount in inventory: \`${item.maxAmount}\`.\n`
                     )
                 .join('\n')}`
         )
@@ -1942,7 +1942,7 @@ if (message.mentions.has(client.user.id)) {
                     `${index + 1} - ${item.custom.locked ? ' 🔒 | ' : ' '}${item.custom.emoji} ` +
                     `**${item.name}** (ID: \`${item.id}\`) - \`${item.price}\` coins ` +
                     `(Hidden since \`${new Date(item.custom.hiddenSince).toLocaleString()}\`)\n` +
-                    `Description: \`${item.description}\`. Max amount in inventory: \`${item.maxAmount}\`. Item use message: \`${item.message}\``
+                    `Description: \`${item.description}\`. Max amount in inventory: \`${item.maxAmount}\`. Item use message: \`${item.message}\`\n`
                 )
                 .join('\n')}`
         )
@@ -2027,7 +2027,7 @@ if (message.mentions.has(client.user.id)) {
                     `${index + 1} - ${item.custom.locked ? ' 🔒 | ' : ' '}${item.custom.emoji} ` +
                     `**${item.name}** (ID: \`${item.id}\`) - \`${item.price}\` coins ` +
                     `(Locked since \`${new Date(item.custom.lockedSince).toLocaleString()}\`)\n` +
-                    `Description: \`${item.description}\`. Max amount in inventory: \`${item.maxAmount}\`. Item use message: \`${item.message}\``
+                    `Description: \`${item.description}\`. Max amount in inventory: \`${item.maxAmount}\`. Item use message: \`${item.message}\`\n`
                 )
                 .join('\n')}`
         )
