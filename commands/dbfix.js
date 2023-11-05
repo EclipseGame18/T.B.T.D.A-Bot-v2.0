@@ -38,7 +38,6 @@ module.exports = {
 
   // Invoked when a user runs the command
   callback: async ({ message, client, channel, interaction, options, args, guild, user, member }) => {
-    if(!member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return ':x: Unable to comply, you do not have \`Manage_Guild\` permision.'
     if(args[0] === 'diagnose'){
         let iserror;
     const welcomemessagechannel = await GuildWelcomeChannel.findOne({_id: guild.id}).catch(error =>{
@@ -172,6 +171,7 @@ module.exports = {
         if(message) message.channel.send({ embeds: [diagnoseembed] })
     }
     else if(args[0] === 'fix'){
+      if(!member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return ':x: Unable to comply, you do not have \`Manage_Guild\` permision.'
         let iserror;
         const welcomemessagechannel = await GuildWelcomeChannel.findOne({_id: guild.id}).catch(error =>{
             console.log(`There was a error: ${error}`)
