@@ -16,22 +16,8 @@ module.exports = {
 
   // Invoked when a user runs the command
   callback: async ({ message, client, channel, interaction, options, args, text, guild, user, member }) => {
-    const guildwelcomechannel = await GuildWelcomeChannel.findOne({_id: guild.id}).catch(error =>{
-		console.log(`There was a error`)
-	})
     if (!member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return ':x: Unable to comply, you do not have \`Manage_Guild\` permision.'
     let newText
-    if(!guildwelcomechannel){
-        await GuildWelcome.findOneAndUpdate({
-            _id: guild.id
-            },{
-            _id: guild.id,
-            message: '',
-                
-            },{
-                upsert: true
-            })
-       }
        if(!text){
         newText = ''
        } else{

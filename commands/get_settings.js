@@ -21,23 +21,30 @@ module.exports = {
 
   // Invoked when a user runs the command
   callback: async ({ message, client, channel, interaction, options, args, guild, user, member }) => {
+    let iserror;
     const welcomemessagechannel = await GuildWelcomeChannel.findOne({_id: guild.id}).catch(error =>{
         console.log(`There was a error: ${error}`)
+        iserror = true
       })
         const guildwelcome = await GuildWelcome.findOne({_id: guild.id}).catch(error =>{
         console.log(`There was a error: ${error}`)
+        iserror = true
       })
       const toggleSware = await ToggleAntiSware.findOne({_id: guild.id}).catch(error =>{
         console.log(`There was a error: ${error}`)
+        iserror = true
       })
       const logchannel = await LogChannel.findOne({_id: guild.id}).catch(error =>{
         console.log(`There was a error: ${error}`)
+        iserror = true
       })
       const toggleImg = await ToggleImg.findOne({_id: guild.id}).catch(error =>{
         console.log(`There was a error: ${error}`)
+        iserror = true
       })
       const getPrefix = await GetPrefix.findOne({_id: guild.id}).catch(error =>{
         console.log(`There was a error: ${error}`)
+        iserror = true
       })
       let truetoggle;
       try{
@@ -49,6 +56,7 @@ module.exports = {
               }
       } catch{
         truetoggle = 'Error retreving guild anti-swear status.'
+        iserror = true
       }
       const toggleMusic = await ToggleMusic.findOne({_id: guild.id}).catch(error => {
         console.log(`There was an error: ${error}`)
@@ -67,6 +75,7 @@ module.exports = {
       }
     }catch{
       musicToggle = 'Error retreving Music module status'
+      iserror = true
     }
     try {
       if(toggleImg.toggle === 'true'){
@@ -77,6 +86,7 @@ module.exports = {
       }
     } catch  {
       imgToggle = 'Error retreving Image Generation module status'
+      iserror = true
     }
 
     try{
@@ -87,6 +97,7 @@ module.exports = {
       }
     }catch{
       ecoToggle = 'Error Economy module status'
+      iserror = true
     }
 
       let welcomeToggle;
@@ -101,6 +112,7 @@ module.exports = {
         }
         } catch{
         welcomeToggle = 'Error retreving welcome message status';
+        iserror = true
         }
 
         let logChannel;
@@ -115,6 +127,7 @@ module.exports = {
         }
         } catch{
             logChannel = 'Error retreving log channel status'
+            iserror = true
         }
 
         let welcomeChannel;
@@ -129,9 +142,11 @@ module.exports = {
         }
         } catch{
           welcomeChannel = 'Error retreving log channel status'
+          iserror = true
         }
         const settings = new EmbedBuilder()
         .setTitle('Current server settings:')
+        .setDescription(`${iserror ? `It appears there are some errors in your servers database, try runnng /dbfix to attempt to resolve these problems.` : " "}`)
         .addFields(
             {name: "Guild anti-swear", value: `The guild anti-swear plugin is currentaly: \`${truetoggle}\``},
             {name: "Guild Prefix", value: `The Guild Prefix is currentaly: \`${getPrefix.prefix}\``},

@@ -2,7 +2,7 @@ const { CommandType, Command } = require("wokcommands");
 const { PermissionsBitField, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ApplicationCommandOptionType } = require('discord.js')
 const GuildPrefix = require('../Guild')
 const GlobalPrefix = '!'
-const version = '2.1'
+const version = '2.2'
 
 module.exports = {
   // command options
@@ -52,7 +52,7 @@ module.exports = {
             {name: 'Got some feedback?', value: `You can submit feedback through the /feedback command`}
         )
         .setColor('#00B9FF')
-        .setFooter({ text: `T.B.T.D.A version: ${version} | Counting 122 total commands!` })
+        .setFooter({ text: `T.B.T.D.A version: ${version} | Counting 124 total commands!` })
         if(message){
             return message.channel.send({ embeds: [noArgs] })
         }
@@ -63,7 +63,7 @@ module.exports = {
     if(args[0] === 'utility'){
         const utility = new EmbedBuilder()
         .setTitle('Utility commands')
-        .setDescription(`Here is T.B.T.D.A's 20 utility commands: ([L] = legacy command only)`)
+        .setDescription(`Here is T.B.T.D.A's 22 utility commands: ([L] = legacy command only)`)
         .addFields(
             {name: '/clear', value: 'Clears a specified amount of messages form a channel'},
             {name: '/join', value: 'T.B.T.D.A will join the VC you are currentaly in'},
@@ -84,7 +84,9 @@ module.exports = {
             {name: '/reset_settings', value: 'Reset allof T.B.T.D.A\'s settings in your guild'},
             {name: '/get_settings', value: 'Get all the current guild settings'},
             {name: '/notice', value: 'Get either the latest notice form the developers, or the latest T.B.T.D.A changelog'},
-            {name: '/ping', value: 'Get T.B.T.D.A\'s current ping'}
+            {name: '/ping', value: 'Get T.B.T.D.A\'s current ping'},
+            {name: '/create_role', value: 'Creates a new role in your guild'},
+            {name: '/dbfix', value: 'Attempt to diagnose and repair your servers settings database'}
         )
         .setFooter({ text: `T.B.T.D.A version: ${version} | Current server prefix: ${prefix}` })
         .setColor('#00B9FF')
