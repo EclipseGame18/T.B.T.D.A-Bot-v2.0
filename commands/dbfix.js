@@ -354,7 +354,7 @@ module.exports = {
 
             const fixembed = new EmbedBuilder()
         .setTitle(`${guild.name} database diagnostic and repair results`)
-        .setDescription(`${iserror ? `All database errors have been succesfully fixed` : "Nothing was changed, there were no database errors found."}`)
+        .setDescription(`${iserror ? `All database errors have been succesfully fixed!` : "Nothing was changed, there were no database errors found."}`)
         .addFields(
             {name: "Guild anti-swear", value: `${truetoggle}`},
             {name: "Guild Prefix", value: `${prefixcheck}`},

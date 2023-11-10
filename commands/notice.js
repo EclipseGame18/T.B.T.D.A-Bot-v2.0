@@ -35,7 +35,7 @@ module.exports = {
         }
             }
             else if(choice === 'changelog'){
-              return('**CHANGELOG:** T.B.T.D.A v2.1\n```\n-Added /member_info and /ping commands\n-Lots of bug fixes\n-Music module working again\n-Added more minor features (quality of life features)\n```')
+              return('**CHANGELOG:** T.B.T.D.A v2.2\n```\n-Added /dbfix command (info in help menu under utility page)\n-Added /create_role command (info in help menu under utility page)\n-Fixed typos\n-More bug fixes and quality of life updates\n-As of this message, (origionally posted 06/11/23) all plugins are working correctly (music, image, economy, mod, fun, utility)\n```')
             }
             else{
               return(`Please enter either \`notice\` for the latest notice from the developers, or \`changelog\` for the latest T.B.T.D.A changelog.`)
