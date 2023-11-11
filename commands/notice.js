@@ -7,9 +7,22 @@ module.exports = {
   catagory: 'Utility Commands',
   aliases: ['announcement'],
   minArgs: 1,
-  maxArgs: 1,
-  expectedArgs: "[notice or changelog]",
-  guildOnly: false,
+  expectedArgs: "<choice>",
+  expectedArgsTypes: ['STRING'],
+  guildOnly: true,
+  options: [
+    {
+      name: 'notice-or-changelog',
+      description: 'select either to view the latest notice or changelog',
+      type: 3, // Set the option type to 6 (User mention)
+      required: true,
+      autocomplete: true,
+    },
+  ],
+
+  autocomplete: (command, argument, interaction) => {
+    return ["notice", "changelog"]; //define the autocomplete values
+  },
   
   // Create a legacy and slash command
   type: CommandType.BOTH,
@@ -35,7 +48,7 @@ module.exports = {
         }
             }
             else if(choice === 'changelog'){
-              return('**CHANGELOG:** T.B.T.D.A v2.2\n```\n-Added /dbfix command (info in help menu under utility page)\n-Added /create_role command (info in help menu under utility page)\n-Fixed typos\n-More bug fixes and quality of life updates\n-As of this message, (origionally posted 06/11/23) all plugins are working correctly (music, image, economy, mod, fun, utility)\n```')
+              return('**CHANGELOG:** T.B.T.D.A v2.2.1\n```\n-Added /timeout and /end_timeout commands (merged over from v1.0)\n-More bug fixes and typo fixes\n-Now counting 126 total commands! (there are probably more to merge over from v1.0)\n```')
             }
             else{
               return(`Please enter either \`notice\` for the latest notice from the developers, or \`changelog\` for the latest T.B.T.D.A changelog.`)

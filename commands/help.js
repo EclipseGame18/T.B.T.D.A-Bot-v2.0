@@ -2,7 +2,7 @@ const { CommandType, Command } = require("wokcommands");
 const { PermissionsBitField, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ApplicationCommandOptionType } = require('discord.js')
 const GuildPrefix = require('../Guild')
 const GlobalPrefix = '!'
-const version = '2.2'
+const version = '2.2.1'
 
 module.exports = {
   // command options

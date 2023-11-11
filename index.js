@@ -45,7 +45,7 @@ const ms = require('ms')
 const stealCooldown = new CommandCooldown('steal', ms('10m'))
 const begCooldown = new CommandCooldown('beg', ms('5m'))
 const depCooldown = new CommandCooldown('dep', ms('60s'))
-const moveMessageCooldown = new CommandCooldown('msg', ms('5m'))
+const noticeCooldown = new CommandCooldown('msg', ms('1h'))
 
 const path = require('path');
 require("dotenv/config");
@@ -235,7 +235,7 @@ client.on('ready', async() => {
         status: 'online',
         activities: [
             {
-                name: `v2.2 in ${client.guilds.cache.size} servers`,
+                name: `v2.2.1 in ${client.guilds.cache.size} servers`,
                 type: ActivityType.Watching,
             }
         ]
@@ -444,7 +444,7 @@ let ttsQueue = []
 let ttsPlayerStatus = false
 let ttsMessageRequirement
 let musicOn = false
-let importantMessage = false
+let importantMessage = true
 
 setInterval(function(){ 
     //code goes here that will be run every 2 seconds.
@@ -626,6 +626,14 @@ client.on('messageCreate', async (message) => {
     const args = message.content.slice(prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();
 
+
+    const author = message.author
+
+    const channelid = message.channel.id
+    const channel = client.channels.cache.get(channelid)
+
+    
+
     const toggleSware = await ToggleAntiSware.findOne({_id: message.guild.id}).catch(error =>{
 		console.log(`There was a error: ${error}`)
 	})
@@ -746,6 +754,8 @@ if (message.mentions.has(client.user.id)) {
 
     if(!message.content.startsWith(prefix)) return;
 
+    infoMessage(channel, author)
+
   //add 1 to the users command usage count
     incrementCommandCount(message.guild.id, message.member.id, (err) => {
         if (err) {
@@ -814,7 +824,7 @@ if (message.mentions.has(client.user.id)) {
     args[0];
     if(command === 'play' || command === 'p'){
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
-        infoMessage(message)
+        
         if (!message.member.voice.channel) {
             return message.reply(":x: Unable to comply, you need to be in a voice channel to use this command.");
           }
@@ -840,7 +850,7 @@ if (message.mentions.has(client.user.id)) {
     }
     else if(command === 'playlist' || command === 'pl'){
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
-        infoMessage(message)
+        
         if (!message.member.voice.channel) {
             return message.reply(":x: Unable to comply, you need to be in a voice channel to use this command.");
           }
@@ -864,7 +874,7 @@ if (message.mentions.has(client.user.id)) {
     }
     else if(command === 'skip' || command === 's'){
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
-        infoMessage(message)
+        
         try{
             guildQueue.skip();
         }catch(err){
@@ -878,7 +888,7 @@ if (message.mentions.has(client.user.id)) {
     }
     else if(command == 'stop'){
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
-        infoMessage(message)
+        
         try{
             guildQueue.stop()
             musicOn = false
@@ -894,7 +904,7 @@ if (message.mentions.has(client.user.id)) {
     }
     else if(command === 'loopoff') {
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
-        infoMessage(message)
+        
         try{
             guildQueue.setRepeatMode(RepeatMode.DISABLED); // or 0 instead of RepeatMode.DISABLED
         }catch(err){
@@ -910,7 +920,7 @@ if (message.mentions.has(client.user.id)) {
 
     else if(command === 'loopsong') {
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
-        infoMessage(message)
+        
         try{
             guildQueue.setRepeatMode(RepeatMode.SONG); // or 1 instead of RepeatMode.SONG
         }catch(err){
@@ -926,7 +936,7 @@ if (message.mentions.has(client.user.id)) {
 
     else if(command === 'loopqueue') {
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
-        infoMessage(message)
+        
         try{
             guildQueue.setRepeatMode(RepeatMode.QUEUE); // or 2 instead of RepeatMode.QUEUE
         }catch(err){
@@ -942,7 +952,7 @@ if (message.mentions.has(client.user.id)) {
 
     else if(command === 'setvolume') {
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
-        infoMessage(message)
+        
         try{
             if(!args[0]) return message.reply('Please specify a new volume.')
             if(args[0] > 200) return message.reply(`Hay, ${args[0]}% is too high! I will not let you blast off your ears or anyone else on the voice channel! -_-`)
@@ -961,7 +971,7 @@ if (message.mentions.has(client.user.id)) {
 
     else if(command === 'seek') {
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
-        infoMessage(message)
+        
         try{
             if(!args[0]) return message.reply('Please specify a time in seconds to seek.')
             guildQueue.seek(parseInt(args[0]) * 1000);
@@ -978,7 +988,7 @@ if (message.mentions.has(client.user.id)) {
 
     else if(command === 'clearqueue') {
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
-        infoMessage(message)
+        
         try{
             guildQueue.clearQueue();
         }catch(err){
@@ -994,7 +1004,7 @@ if (message.mentions.has(client.user.id)) {
 
     else if(command === 'shuffle') {
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
-        infoMessage(message)
+        
         try{
             guildQueue.shuffle();
         }catch(err){
@@ -1010,7 +1020,7 @@ if (message.mentions.has(client.user.id)) {
 
     else if(command === 'queue') {
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
-        infoMessage(message)
+        
         try{
             let initqueue = player.getQueue(message.guild.id)
             let requestedBy = initqueue.data.requestedBy
@@ -1035,7 +1045,7 @@ if (message.mentions.has(client.user.id)) {
 
     else if(command === 'volume') {
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
-        infoMessage(message)
+        
         try{
             const volume = new EmbedBuilder()
             .setTitle('The queue volume is:')
@@ -1050,7 +1060,7 @@ if (message.mentions.has(client.user.id)) {
 
     else if(command === 'playing') {
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
-        infoMessage(message)
+        
         try{
             const ProgressBar = guildQueue.createProgressBar();
             const playing = new EmbedBuilder()
@@ -1070,7 +1080,7 @@ if (message.mentions.has(client.user.id)) {
 
     else if(command === 'pause') {
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
-        infoMessage(message)
+        
         try{
             guildQueue.setPaused(true);
         }catch(err){
@@ -1086,7 +1096,7 @@ if (message.mentions.has(client.user.id)) {
 
     else if(command === 'resume') {
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
-        infoMessage(message)
+        
         try{
             guildQueue.setPaused(false);
         }catch(err){
@@ -1102,7 +1112,7 @@ if (message.mentions.has(client.user.id)) {
 
     else if(command === 'remove') {
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
-        infoMessage(message)
+        
         if(!guildQueue) return message.channel.send(':x: Unable to comply, the queue is currentaly empty.')
         try{
         let song = args[0]
@@ -1121,7 +1131,7 @@ if (message.mentions.has(client.user.id)) {
 
     else if(command === 'progress') {
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
-        infoMessage(message)
+        
         try{
         const ProgressBar = guildQueue.createProgressBar();
         
@@ -1138,7 +1148,7 @@ if (message.mentions.has(client.user.id)) {
     }
     else if(command === 'bal' || command === 'balance'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
-        infoMessage(message)
+        
         const [userID] = args
 
         const member =
@@ -1169,7 +1179,7 @@ if (message.mentions.has(client.user.id)) {
     else if (command === 'add_coins'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
         if (!message.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return message.reply(`:x: Unable to comply, you do not have \`Manage_Guild\` permision.`)
-        infoMessage(message)
+        
         const [userID] = args
         const user = message.mentions.users.first() || getUser(userID)
 
@@ -1209,7 +1219,7 @@ if (message.mentions.has(client.user.id)) {
     else if (command === 'remove_coins'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
         if (!message.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return message.reply(`:x: Unable to comply, you do not have \`Manage_Guild\` permision.`)
-        infoMessage(message)
+        
         const [userID] = args
         const user = message.mentions.users.first() || getUser(userID)
 
@@ -1249,7 +1259,7 @@ if (message.mentions.has(client.user.id)) {
     }
     else if (command === 'daily'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
-        infoMessage(message)
+        
         const dailyResult = await user.rewards.getDaily()
 
         if(dailyResult.claimed){
@@ -1279,7 +1289,7 @@ if (message.mentions.has(client.user.id)) {
     }
     else if(command === 'monthly'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
-        infoMessage(message)
+        
         const monthlyResult = await user.rewards.getMonthly()
 
         if(monthlyResult.claimed){
@@ -1309,7 +1319,7 @@ if (message.mentions.has(client.user.id)) {
     }
     else if (command === 'hourly'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
-        infoMessage(message)
+        
         const hourlyResult = await user.rewards.getHourly()
 
         if(hourlyResult.claimed){
@@ -1339,7 +1349,7 @@ if (message.mentions.has(client.user.id)) {
     }
     else if (command === 'work'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
-        infoMessage(message)
+        
         const workResult = await user.rewards.getWork()
 
         if (!workResult.claimed) {
@@ -1380,7 +1390,7 @@ if (message.mentions.has(client.user.id)) {
     }
     else if (command === 'weekly'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
-        infoMessage(message)
+        
         const weeklyResult = await user.rewards.getWeekly()
 
         if (!weeklyResult.claimed) {
@@ -1410,7 +1420,7 @@ if (message.mentions.has(client.user.id)) {
     }
     else if (command === 'transfer'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
-        infoMessage(message)
+        
         const [id, amountString] = args
 
         const sender = user
@@ -1455,7 +1465,7 @@ if (message.mentions.has(client.user.id)) {
     }
     else if (command === 'steal'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
-        infoMessage(message)
+        
         const underCooldown = await stealCooldown.getUser(message.author.id)
         if(underCooldown){
             const time = msToMinutes(underCooldown.msLeft, false)
@@ -1536,7 +1546,7 @@ if (message.mentions.has(client.user.id)) {
     }
     else if (command === 'beg'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
-        infoMessage(message)
+        
         const underCooldown = await begCooldown.getUser(message.author.id)
         if(underCooldown){
             const time = msToMinutes(underCooldown.msLeft, false)
@@ -1590,7 +1600,7 @@ if (message.mentions.has(client.user.id)) {
     }
     else if (command === 'dep' || command === 'deposit'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
-        infoMessage(message)
+        
         const underCooldown = await depCooldown.getUser(message.author.id)
         if(underCooldown){
             const time = msToMinutes(underCooldown.msLeft, false)
@@ -1646,7 +1656,7 @@ if (message.mentions.has(client.user.id)) {
     }
     else if (command === 'withdraw'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
-        infoMessage(message)
+        
         const [amountString] = args
 
         const userBankBalance = await user.bank.get()
@@ -1686,7 +1696,7 @@ if (message.mentions.has(client.user.id)) {
     }
     else if (command === 'lb' || command === 'rich' || command === "leader_board"){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
-        infoMessage(message)
+        
         const rawLeaderboard = await guild.leaderboards.money()
 
         const leaderboard = rawLeaderboard
@@ -1706,7 +1716,7 @@ if (message.mentions.has(client.user.id)) {
     }
     else if (command === 'shop'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
-        infoMessage(message)
+        
         const guildShop = shop.filter(item => !item.custom.hidden)
 
         if (!guildShop.length) {
@@ -1727,7 +1737,7 @@ if (message.mentions.has(client.user.id)) {
     }
     else if (command === 'item_info'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
-        infoMessage(message)
+        
         const [itemID] = args
 
         const item = shop.find(item => item.id == parseInt(itemID) || item.name == itemID)
@@ -1764,7 +1774,7 @@ if (message.mentions.has(client.user.id)) {
     }
     else if (command === 'add_shop_item'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
-        infoMessage(message)
+        
         let [name, emoji, priceString, description, maxAmount, role] = args
 
         if(args[0] === 'syntax'){
@@ -1834,7 +1844,7 @@ if (message.mentions.has(client.user.id)) {
     else if (command === 'remove_shop_item'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
         if (!message.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return message.reply(`:x: Unable to comply, you do not have \`Manage_Guild\` permision.`)
-        infoMessage(message)
+        
         const [itemID] = args
 
         const item = shop.find(item => item.id == parseInt(itemID) || item.name == itemID)
@@ -1852,7 +1862,7 @@ if (message.mentions.has(client.user.id)) {
     else if (command === 'edit_item'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
         if (!message.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return message.reply(`:x: Unable to comply, you do not have \`Manage_Guild\` permision.`)
-        infoMessage(message)
+        
         if(args[0] === 'syntax'){
             return message.channel.send(`Syntax for \`!edit_item\` command:\n\`!edit_item\` \`{item ID}\` \`{item property}\` \`{new value}\``)
         }
@@ -1896,7 +1906,7 @@ if (message.mentions.has(client.user.id)) {
     else if (command === 'hide_item'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
         if (!message.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return message.reply(`:x: Unable to comply, you do not have \`Manage_Guild\` permision.`)
-        infoMessage(message)
+        
         const [itemID] = args
         const item = shop.find(item => item.id == parseInt(itemID) || item.name == itemID)
 
@@ -1927,7 +1937,7 @@ if (message.mentions.has(client.user.id)) {
     else if (command === 'hidden_shop'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
         if (!message.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return message.reply(`:x: Unable to comply, you do not have \`Manage_Guild\` permision.`)
-        infoMessage(message)
+        
         const hiddenShop = shop.filter(item => item.custom.hidden)
 
         if (!hiddenShop.length) {
@@ -1950,7 +1960,7 @@ if (message.mentions.has(client.user.id)) {
     else if (command === 'unhide_item'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
         if (!message.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return message.reply(`:x: Unable to comply, you do not have \`Manage_Guild\` permision.`)
-        infoMessage(message)
+        
         const [itemID] = args
         const item = shop.find(item => item.id == parseInt(itemID) || item.name == itemID)
 
@@ -1981,7 +1991,7 @@ if (message.mentions.has(client.user.id)) {
     else if (command === 'lock_item'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
         if (!message.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return message.reply(`:x: Unable to comply, you do not have \`Manage_Guild\` permision.`)
-        infoMessage(message)
+        
         const [itemID] = args
         const item = shop.find(item => item.id == parseInt(itemID) || item.name == itemID)
 
@@ -2012,7 +2022,7 @@ if (message.mentions.has(client.user.id)) {
     else if (command === 'locked_shop'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
         if (!message.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return message.reply(`:x: Unable to comply, you do not have \`Manage_Guild\` permision.`)
-        infoMessage(message)
+        
         const lockedShop = shop.filter(item => item.custom.locked)
 
         if (!lockedShop.length) {
@@ -2035,7 +2045,7 @@ if (message.mentions.has(client.user.id)) {
     else if (command === 'unlock_item'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
         if (!message.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return message.reply(`:x: Unable to comply, you do not have \`Manage_Guild\` permision.`)
-        infoMessage(message)
+        
         const [itemID] = args
 
         const item = shop.find(item => item.id == parseInt(itemID) || item.name == itemID)
@@ -2067,7 +2077,7 @@ if (message.mentions.has(client.user.id)) {
     else if (command === 'clear_shop'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
         if (!message.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) return message.reply(`:x: Unable to comply, you do not have \`Manage_Guild\` permision.`)
-        infoMessage(message)
+        
         if(args[0] === 'confirm'){
         if (!shop.length) {
             return message.channel.send(`${message.author}, there are no items in the shop.`)
@@ -2085,7 +2095,7 @@ if (message.mentions.has(client.user.id)) {
     }
     else if (command === 'inv' || command === 'inventory'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
-        infoMessage(message)
+        
         const userInventory = inventory.filter(item => !item.custom.hidden)
 
         if (!userInventory.length) {
@@ -2118,7 +2128,7 @@ if (message.mentions.has(client.user.id)) {
     }
     else if (command === 'clear_inv' || command === 'clear_inventory'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
-        infoMessage(message)
+        
         if(args[0] === 'confirm'){
         if (!inventory.length) {
             return message.channel.send(`${message.author}, you don't have any items in your inventory.`)
@@ -2136,7 +2146,7 @@ if (message.mentions.has(client.user.id)) {
     }
     else if (command === 'history'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
-        infoMessage(message)
+        
         //const userHistory = history.filter(item => !item.custom.hidden) [old way, uses cache. cache is broken.]
         const userHistory = user.history.get() // new way, gets directaly from data base.
         if (!(await userHistory).length) {
@@ -2154,7 +2164,7 @@ if (message.mentions.has(client.user.id)) {
     }
     else if (command === 'clear_history'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
-        infoMessage(message)
+        
         if(args[0] === 'confirm'){
             const userHistory = user.history.get()
         if (!(await userHistory).length) {
@@ -2173,7 +2183,7 @@ if (message.mentions.has(client.user.id)) {
     }
     else if (command === 'buy'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
-        infoMessage(message)
+        
         if(args[0] === 'syntax'){
             return message.channel.send(`Syntax for \`!buy\` command:\n\`!buy\` \`{item ID}\` \`{item quantity}\``)
         }
@@ -2214,7 +2224,7 @@ if (message.mentions.has(client.user.id)) {
     }
     else if (command === 'use_item' || command === 'use'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
-        infoMessage(message)
+        
         const [itemID] = args
         const item = inventory.find(item => item.id == parseInt(itemID) || item.name == itemID)
 
@@ -2235,7 +2245,7 @@ if (message.mentions.has(client.user.id)) {
     }
     else if (command === 'sell'){
         if(ecoStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the economy plugin.`)
-        infoMessage(message)
+        
         const [itemID, quantityString] = args
         const quantity = parseInt(quantityString) || 1
 
@@ -2295,7 +2305,7 @@ if (message.mentions.has(client.user.id)) {
 
     }
     else if(command === 'tts'){
-        infoMessage(message)
+        
         if(!message.member.voice.channel) return message.channel.send(`${message.author}, you myst be in a voice channel to use this command.`)
         if(musicOn === true) return message.reply(`:x: You must stop music playback before starting TTS, use \`!stop\` to stop music playback.`)
         if(ttsOn === true) return message.reply(":x: TTS is already actave, use !tts_off to turn off TTS.")
@@ -2307,7 +2317,7 @@ if (message.mentions.has(client.user.id)) {
         tts(message)
     }
     else if(command === 'tts_off'){
-        infoMessage(message)
+        
         if(ttsOn === false) return message.channel.send(':x: TTS is alreay off, use `!leave` to disconnect the bot form a channel.')
         let ttsChannelname = message.guild.channels.cache.get(ttsChannel)
         if(message.channel.id !== ttsChannel) return message.channel.send(`:x: You must run this command in the current TTS channel, ${ttsChannelname}`)
@@ -2331,6 +2341,11 @@ if (message.mentions.has(client.user.id)) {
 
 client.on('interactionCreate', (interaction) => {
     if (!interaction.isCommand()) return; // Ignore non-command interactions
+
+    const channelid = interaction.channel.id
+    const channel = client.channels.cache.get(channelid)
+    const author = interaction.member
+    infoMessage(channel, author)
 
     //add 1 to the users command usage count
       incrementCommandCount(interaction.guild.id, interaction.user.id, (err) => {
@@ -2367,9 +2382,9 @@ async function tts(message){
         }
 }
 
-async function infoMessage(message){
+async function infoMessage(message, author){
     if(importantMessage === false) return
-    const underCooldown = await moveMessageCooldown.getUser(message.author.id)
+    const underCooldown = await noticeCooldown.getUser(author.id)
         if(underCooldown){
             return
         }
@@ -2391,16 +2406,23 @@ async function infoMessage(message){
     }
     const chance = generateRandom()
     if(chance < 0 || chance === 0){
-        await moveMessageCooldown.addUser(message.author.id)
+        await noticeCooldown.addUser(author.id)
         return
     }
     if(chance > 0){
-		const UME = new EmbedBuilder()
+		const notice = new EmbedBuilder()
             .setTitle('You have a message form the developers!')
-            .setDescription(`Hey, ${message.author}, you have a important message from the developers.\nTo view the important announcement, use command \`/notice notice\` (or \`!notice notice\`).`)
+            .setDescription(`Hey, ${author}, did you know you can acces T.B.T.D.A's changelog by running \`/notice changelog\` (or \`!notice changelog\` for legacy), why not give it a shot?`)
             .setColor('#0059FF');
-        message.reply({ embeds: [UME] });
-        await moveMessageCooldown.addUser(message.author.id)
+
+        try {
+            message.send({ embeds: [notice] })
+        } catch (error) {
+            console.log(`Failed sending notice: ${error}`)
+            await noticeCooldown.addUser(author.id)
+            return
+        }
+        await noticeCooldown.addUser(author.id)
     }
 
 }
