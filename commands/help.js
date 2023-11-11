@@ -47,12 +47,12 @@ module.exports = {
         .addFields(
             {name: 'What prefix do I use?', value: `T.B.T.D.A supports slash (**/**) and legacy commands. The defult legacy command prefix is **!**, but this can be changed with \`/prefix {new prefix}\`. The current guild prefix is: **${prefix}**`},
             {name: 'Need more help?', value: `If you require more help, you can join our Discord [support server](https://discord.gg/3mkKSGw). Do you want all avalable infomation on T.B.T.D.A? Check out T.B.T.D.A's [official docs!](https://docs.tbtda.xyz)`},
-            {name: 'Want to configure the bot online?', value: `Check out the online [web dashboard](https://tbtda.xyz) to configure and setup the bot to suit your needs`},
+            {name: 'Want to configure the bot online?', value: `Check out the online [web dashboard](https://tbtda.xyz) to configure and setup the bot to suit your needs.`},
             {name: 'Need to contact us?', value: `You can contact us either via the [support server](https://discord.gg/3mkKSGw), or you can email us directaly at support@tbtda.xyz`},
-            {name: 'Got some feedback?', value: `You can submit feedback through the /feedback command`}
+            {name: 'Got some feedback?', value: `You can submit feedback through the \`/feedback\` command.`}
         )
         .setColor('#00B9FF')
-        .setFooter({ text: `T.B.T.D.A version: ${version} | Counting 124 total commands!` })
+        .setFooter({ text: `T.B.T.D.A version: ${version} | Counting 126 total commands!` })
         if(message){
             return message.channel.send({ embeds: [noArgs] })
         }
@@ -123,12 +123,14 @@ module.exports = {
     else if(args[0] === 'moderation'){
         const mod = new EmbedBuilder()
         .setTitle('Mod/Admin commands')
-        .setDescription(`Here is T.B.T.D.A's 12 moderation commands. Please keep in mind that these commands do require the user to have special permissions in order to execute.`)
+        .setDescription(`Here is T.B.T.D.A's 14 moderation commands. Please keep in mind that these commands do require the user to have special permissions in order to execute.`)
         .addFields(
             {name: '/log', value: 'Send a log to the servers log channel'},
             {name: '/warn', value: 'Warn a user'},
             {name: '/kick', value: 'Kick a user form your server'},
             {name: '/ban', value: 'Ban a user form your server'},
+            {name: '/timeout', value: 'Set a Discord timeout for a user'},
+            {name: '/end_timeout', value: 'End a Discord timeout for a user'},
             {name: '/guild_log_channel', value: 'Set the guild log channel'},
             {name: '/guild_welcome_channel', value: 'Set the guild welcome channel'},
             {name: '/guild_welcome', value: 'Set the guild welcome message'},
