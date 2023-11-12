@@ -235,7 +235,7 @@ client.on('ready', async() => {
         status: 'online',
         activities: [
             {
-                name: `v2.2.1 in ${client.guilds.cache.size} servers`,
+                name: `v2.2.2 in ${client.guilds.cache.size} servers`,
                 type: ActivityType.Watching,
             }
         ]

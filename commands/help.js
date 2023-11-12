@@ -2,7 +2,7 @@ const { CommandType, Command } = require("wokcommands");
 const { PermissionsBitField, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ApplicationCommandOptionType } = require('discord.js')
 const GuildPrefix = require('../Guild')
 const GlobalPrefix = '!'
-const version = '2.2.1'
+const version = '2.2.2'
 
 module.exports = {
   // command options
@@ -52,7 +52,7 @@ module.exports = {
             {name: 'Got some feedback?', value: `You can submit feedback through the \`/feedback\` command.`}
         )
         .setColor('#00B9FF')
-        .setFooter({ text: `T.B.T.D.A version: ${version} | Counting 126 total commands!` })
+        .setFooter({ text: `T.B.T.D.A version: ${version} | Counting 127 total commands!` })
         if(message){
             return message.channel.send({ embeds: [noArgs] })
         }
@@ -80,8 +80,8 @@ module.exports = {
             {name: '/channelCommand', value: 'Allows for server admins to customize which slash command can be ran certan channels'},
             {name: '/customCommand create', value: 'Create a custom slash and legacy command for your server'},
             {name: '/customCommand delete', value: 'Delete your servers custom commands, however, this cannot delete T.B.T.D.A\'s official commands'},
-            {name: '/setup', value: 'Learn how to setup T.B.T.D.A in your server'},
-            {name: '/reset_settings', value: 'Reset allof T.B.T.D.A\'s settings in your guild'},
+            {name: '/setup', value: "View T.B.T.D.A's setup manual"},
+            {name: '/reset_settings', value: 'Reset all of T.B.T.D.A\'s settings in your guild'},
             {name: '/get_settings', value: 'Get all the current guild settings'},
             {name: '/notice', value: 'Get either the latest notice form the developers, or the latest T.B.T.D.A changelog'},
             {name: '/ping', value: 'Get T.B.T.D.A\'s current ping'},
@@ -101,7 +101,7 @@ module.exports = {
     else if(args[0] === 'fun'){
         const fun = new EmbedBuilder()
         .setTitle('Fun commands')
-        .setDescription(`Here is T.B.T.D.A's 7 fun commands:`)
+        .setDescription(`Here is T.B.T.D.A's 8 fun commands:`)
         .addFields(
             {name: '/8ball', value: 'Ask the 8ball a question, and get the answer you have been waiting for'},
             {name: '/flip', value: 'Flip a coin'},
@@ -109,7 +109,8 @@ module.exports = {
             {name: '/roll', value: 'Roll a dice up to a maxmum of 24 sides'},
             {name: '/rps', value: 'Play rock, paper, scissors with T.B.T.D.A'},
             {name: '/random_colour', value: 'Generates a random color and displays the HEX and RGB values'},
-            {name: '/get_avatar', value: 'Get a user\'s avatar'}
+            {name: '/get_avatar', value: 'Get a user\'s avatar'},
+            {name: '/meme', value: 'Find a random meme from r/memes'}
         )
         .setFooter({ text: `T.B.T.D.A version: ${version} | Current server prefix: ${prefix}` })
         .setColor('#00B9FF')

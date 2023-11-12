@@ -14,7 +14,7 @@ module.exports = {
     {
       name: 'notice-or-changelog',
       description: 'select either to view the latest notice or changelog',
-      type: 3, // Set the option type to 6 (User mention)
+      type: 3, // Set the option type to 3 (string input)
       required: true,
       autocomplete: true,
     },
@@ -48,7 +48,7 @@ module.exports = {
         }
             }
             else if(choice === 'changelog'){
-              return('**CHANGELOG:** T.B.T.D.A v2.2.1\n```\n-Added /timeout and /end_timeout commands (merged over from v1.0)\n-More bug fixes and typo fixes\n-Now counting 126 total commands! (there are probably more to merge over from v1.0)\n```')
+              return('**CHANGELOG:** T.B.T.D.A v2.2.2\n```\n-Added /meme command (info in help menu under fun page)\n-Fix more bugs and typos\n-Added some new easter eggs to find...\n```')
             }
             else{
               return(`Please enter either \`notice\` for the latest notice from the developers, or \`changelog\` for the latest T.B.T.D.A changelog.`)
