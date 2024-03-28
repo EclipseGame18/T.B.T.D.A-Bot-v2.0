@@ -12,6 +12,8 @@ const {CommandCooldown, msToMinutes} = require('discord-command-cooldown');
 
 const sqlite3 = require('sqlite3').verbose();
 
+const version = 'v2.2.3'
+
 // Connect to the SQLite database
 const db = new sqlite3.Database('usr-data-temp.db');
 
@@ -70,6 +72,8 @@ const LogChannel = require(`./Guild7`)
 
 const ToggleImg = require('./Guild8')
 
+const LogMsg = require('./Guild9')
+
 function print(log){
     console.log(log)
 }
@@ -87,14 +91,15 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds,
                                       GatewayIntentBits.GuildVoiceStates,
                                       GatewayIntentBits.GuildModeration,
                                       GatewayIntentBits.DirectMessages,
-                                      GatewayIntentBits.GuildPresences
+                                      GatewayIntentBits.GuildPresences,
                                      ],
                                      partials: [
                                         Partials.Channel,
                                         Partials.User,
                                         Partials.Message,
                                         Partials.GuildMember,
-                                        Partials.Reaction
+                                        Partials.Reaction,
+                                        Partials.ThreadMember
                                     ],
                         });
 
@@ -235,7 +240,7 @@ client.on('ready', async() => {
         status: 'online',
         activities: [
             {
-                name: `v2.2.2 in ${client.guilds.cache.size} servers`,
+                name: `${version} in ${client.guilds.cache.size} servers`,
                 type: ActivityType.Watching,
             }
         ]
@@ -360,6 +365,15 @@ client.on("guildCreate", async (guild) => {
                                 },{
                                 _id: guild.id,
                                 toggle: true,
+                                
+                                },{
+                                    upsert: true
+                            })
+                            await LogMsg.findOneAndUpdate({
+                                _id: guild.id
+                                },{
+                                _id: guild.id,
+                                toggle: false,
                                 
                                 },{
                                     upsert: true
@@ -557,6 +571,11 @@ client.on('messageCreate', async (message) => {
       const guildPrefix = await GuildPrefix.findOne({_id: message.guild.id}).catch(error => {
         console.log(`There was an error: ${error}`)
       })
+      const logmsg = await LogMsg.findOne({_id: message.guild.id}).catch(error => {
+        console.log(`There was an error: ${error}`)
+      })
+
+
       if(!guildPrefix || guildPrefix.prefix === ''){
         await GuildPrefix.findOneAndUpdate({
             _id: message.guild.id
@@ -594,6 +613,37 @@ client.on('messageCreate', async (message) => {
                 upsert: true
             })
       }
+
+      if(!logmsg || logmsg === null){
+        await ToggleEco.findOneAndUpdate({
+            _id: message.guild.id
+            },{
+            _id: message.guild.id,
+            toggle: false,
+                
+            },{
+                upsert: true
+            })
+      }
+
+      if(logmsg.toggle === 'true' && logChannel.channel){
+        msgLogChannel = message.guild.channels.cache.get(logChannel.channel)
+
+        //try{
+            const logEmbed = new EmbedBuilder()
+            .setAuthor({ name: `${message.author.username}(${message.author.id})`, iconURL: message.author.avatarURL() })
+            .setDescription(`${message.content}`)
+            .setTimestamp()
+            .setColor('#DAF000')
+
+            msgLogChannel.send({embeds: [logEmbed]})
+        //}catch (err){
+            //console.log(`There was an error logging messages: ${err}`)
+        //}
+      }
+
+
+
       
       if(tts_text === null || !tts_text){
         tts_text = 'TTS encountered and error'
@@ -2337,6 +2387,26 @@ if (message.mentions.has(client.user.id)) {
            message.channel.send(':x: Unable to comply, I am not currently connected to a voice channel.');
         }
     }
+    else if(command === 'reload_status'){
+        if(message.author.id !== '547655594715381760') return console.log(`${message.author.tag} form server: ${message.guild.name} just attempted to run the reload_status command, the attempt was blocked.`)
+
+        client.user?.setPresence({
+            status: 'online',
+            activities: [
+                {
+                    name: `${version} in ${client.guilds.cache.size} servers`,
+                    type: ActivityType.Watching,
+                }
+            ]
+        })
+
+        message.channel.send('Successfully reloaded bot status.')
+    }
+    else if(command === 'gp'){
+        const highrole = message.member.roles.highest
+        message.channel.send(`${highrole}`)
+        message.channel.send(`${highrole.permissions.bitfield}`)
+    }
 })
 
 client.on('interactionCreate', (interaction) => {
@@ -2412,7 +2482,7 @@ async function infoMessage(message, author){
     if(chance > 0){
 		const notice = new EmbedBuilder()
             .setTitle('You have a message form the developers!')
-            .setDescription(`Hey, ${author}, did you know you can acces T.B.T.D.A's changelog by running \`/notice changelog\` (or \`!notice changelog\` for legacy), why not give it a shot?`)
+            .setDescription(`Hey, ${author}, Version 2.2.3 is out! This version includes some minor fixes and a new message logging system, run command /toggle_msg_logging to try it out. Message logging sends messge logs to the server's log channel, this will need to be set before using message logging\nAlso the online dashboard (https://tbtda.xyz) is currentaly down, don't worry though, every setting has a in-bot command as well as a dashboard widget.`)
             .setColor('#0059FF');
 
         try {

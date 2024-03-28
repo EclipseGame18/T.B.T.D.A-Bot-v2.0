@@ -8,6 +8,7 @@ const ToggleEco = require(`../Guild6`)
 const LogChannel = require(`../Guild7`)
 const ToggleImg = require(`../Guild8`)
 const GetPrefix = require(`../Guild`)
+const LogMsg = require("../Guild9")
 
 module.exports = {
   // command options
@@ -46,6 +47,9 @@ module.exports = {
         console.log(`There was a error: ${error}`)
         iserror = true
       })
+      const logmsg = await LogMsg.findOne({_id: guild.id}).catch(error => {
+        console.log(`There was an error: ${error}`)
+      })
       let truetoggle;
       try{
               if (toggleSware.toggle == 'true'){
@@ -67,6 +71,7 @@ module.exports = {
       let musicToggle
       let ecoToggle
       let imgToggle
+      let msgtoggle
       try{
       if(toggleMusic.toggle === 'true'){
         musicToggle = 'on'
@@ -88,6 +93,19 @@ module.exports = {
       imgToggle = 'Error retreving Image Generation module status'
       iserror = true
     }
+
+    try {
+      if(logmsg.toggle === 'true'){
+        msgtoggle = 'on'
+      }
+      else{
+        msgtoggle = 'off'
+      }
+    } catch  {
+      msgtoggle = 'Error retreving Message Logging module status'
+      iserror = true
+    }
+
 
     try{
       if(toggleEco.toggle === 'true'){
@@ -152,6 +170,7 @@ module.exports = {
             {name: "Guild Prefix", value: `The Guild Prefix is currentaly: \`${getPrefix.prefix}\``},
             {name: "Guild Economy plugin", value: `The Economy plugin is currentaly: \`${ecoToggle}\``},
             {name: "Guild Music plugin", value: `The Music plugin is currentaly: \`${musicToggle}\``},
+            {name: "Guild Message Logging", value: `The Message Logging plugin is currentaly: \`${msgtoggle}\``},
             {name: "Guild Image Generation plugin", value: `The Image Generation plugin is currentaly: \`${imgToggle}\``},
             {name: "Guild welcome message", value: `The guild welcome message plugin is currentaly: \`${welcomeToggle}\`. Settig value:\n\`${welcomeValue}\``},
             {name: "Guild Log channel", value: `The guild log channel is currentaly: \`${logChannel}\`. Setting Value:\n\`${logValue}\``},

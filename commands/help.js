@@ -2,7 +2,7 @@ const { CommandType, Command } = require("wokcommands");
 const { PermissionsBitField, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ApplicationCommandOptionType } = require('discord.js')
 const GuildPrefix = require('../Guild')
 const GlobalPrefix = '!'
-const version = '2.2.2'
+const version = '2.2.3'
 
 module.exports = {
   // command options
@@ -52,7 +52,7 @@ module.exports = {
             {name: 'Got some feedback?', value: `You can submit feedback through the \`/feedback\` command.`}
         )
         .setColor('#00B9FF')
-        .setFooter({ text: `T.B.T.D.A version: ${version} | Counting 127 total commands!` })
+        .setFooter({ text: `T.B.T.D.A version: ${version} | Counting 128 total commands!` })
         if(message){
             return message.channel.send({ embeds: [noArgs] })
         }
@@ -124,7 +124,7 @@ module.exports = {
     else if(args[0] === 'moderation'){
         const mod = new EmbedBuilder()
         .setTitle('Mod/Admin commands')
-        .setDescription(`Here is T.B.T.D.A's 14 moderation commands. Please keep in mind that these commands do require the user to have special permissions in order to execute.`)
+        .setDescription(`Here is T.B.T.D.A's 15 moderation commands. Please keep in mind that these commands do require the user to have special permissions in order to execute.`)
         .addFields(
             {name: '/log', value: 'Send a log to the servers log channel'},
             {name: '/warn', value: 'Warn a user'},
@@ -139,7 +139,8 @@ module.exports = {
             {name: '/toggle_image', value: 'Toggle the image generation plugin on or off'},
             {name: '/toggle_music', value: 'Toggle the music plugin on or off'},
             {name: '/toggle_swear', value: 'Toggle the guild anti-swear plugin on or off'},
-            {name: '/member_info', value: 'Get infomation on any member in your guild'}
+            {name: '/member_info', value: 'Get infomation on any member in your guild'},
+            {name: '/toggle_msg_logging', value: 'Toggle the guild message logging plugin on or off (requires guild_log_channel to be set)'}
         )
         .setFooter({ text: `T.B.T.D.A version: ${version} | Current server prefix: ${prefix}` })
         .setColor('#00B9FF')

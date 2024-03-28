@@ -53,6 +53,7 @@ callback: async ({message, client, channel, interaction, options, args, guild, u
     let roleSearch;
     let hoisttruefalse;
     roleSearch = args[0]
+    const highestRole = member.roles.highest
 
     //check if the user has the Discord Manage Roles permission, if not send the error message
     if(!member.permissions.has(PermissionsBitField.Flags.ManageRoles)) return ':x: Unable to comply, you do not have \`Manage_Roles\` permision.'
@@ -82,19 +83,29 @@ callback: async ({message, client, channel, interaction, options, args, guild, u
       })
 
       if(args[3] === 'yes'){ //if add role on create is yes than move on, if not yes than skip
-        try{
-            member.roles.add(role).catch(err => { // add role to user
-                console.log('A role error occured ' + err) // if fail then send the error to console
-                addrolemsg = "I failed to add the role to you." // set {addrolemsg} to fail
-            })
-            addrolemsg = "the role was automatically added to you."
-        }catch(err) { // catch any errors
-            console.log('A role error occured ' + err) // send error to console
-            addrolemsg = "I failed to add the role to you."
-        }
-      } else{
+        
+       // const getrole = guild.roles.cache.find(roles => roles.name === args[0])
+        //console.log(`ROLE ${getrole.name}`)
+        //console.log(`user${highestRole.permissions.bitfield}, role${getrole.permissions.bitfield}`)
+        //if(highestRole.permissions.bitfield > getrole.permissions.bitfield){
+
+
+            try{
+                member.roles.add(role).catch(err => { // add role to user
+                    console.log('A role error occured ' + err) // if fail then send the error to console
+                    addrolemsg = "I failed to add the role to you." // set {addrolemsg} to fail
+                })
+                addrolemsg = "the role was automatically added to you."
+            }catch(err) { // catch any errors
+                console.log('A role error occured ' + err) // send error to console
+                addrolemsg = "I failed to add the role to you."
+            }
+       // } else{
+           // addrolemsg = "I could not add the role because the roles permissions were higher then your current permissions."
+        //}
+    } else{
         addrolemsg = "as per your request, the role was not added to you." // if add role on create is no than {addrolemsg} is roel not added
-      }
+    }
 
       if(addrolemsg === '' || !addrolemsg || addrolemsg === null) addrolemsg = "I failed to add the role to you"
 

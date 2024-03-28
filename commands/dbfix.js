@@ -8,6 +8,7 @@ const ToggleEco = require(`../Guild6`)
 const LogChannel = require(`../Guild7`)
 const ToggleImg = require(`../Guild8`)
 const GetPrefix = require(`../Guild`)
+const LogMsg = require('../Guild9')
 
 module.exports = {
   // command options
@@ -64,6 +65,9 @@ module.exports = {
         console.log(`There was a error: ${error}`)
         iserror = true
       })
+      const logmsg = await LogMsg.findOne({_id: guild.id}).catch(error => {
+        console.log(`There was an error: ${error}`)
+      })
       let prefixcheck;
       try{
         if(getPrefix.prefix){
@@ -90,6 +94,7 @@ module.exports = {
       let musicToggle
       let ecoToggle
       let imgToggle
+      let logtoggle
       try{
       if(toggleMusic.toggle){
         musicToggle = ':white_check_mark: ok'
@@ -113,6 +118,15 @@ module.exports = {
       }
     }catch{
       ecoToggle = ':x: not ok'
+      iserror = true
+    }
+
+    try {
+      if(logmsg.toggle){
+        logtoggle = ':white_check_mark: ok'
+      }
+    } catch {
+      logtoggle = ':x: not ok'
       iserror = true
     }
 
@@ -163,7 +177,8 @@ module.exports = {
             {name: "Guild Image Generation plugin", value: `${imgToggle}`},
             {name: "Guild Welcome Message", value: `${welcomeToggle}`},
             {name: "Guild Welcome Channel", value: `${welcomeChannel}`},
-            {name: "Guild Log Channel", value: `${logChannel}`}
+            {name: "Guild Log Channel", value: `${logChannel}`},
+            {name: "Guild Message Logging", value: `${logtoggle}`}
         )
         .setColor(embedcolour)
 
@@ -190,6 +205,9 @@ module.exports = {
           })
           const getPrefix = await GetPrefix.findOne({_id: guild.id}).catch(error =>{
             console.log(`There was a error: ${error}`)
+          })
+          const logmsg = await LogMsg.findOne({_id: guild.id}).catch(error => {
+            console.log(`There was an error: ${error}`)
           })
           let prefixcheck;
           try{
@@ -236,6 +254,7 @@ module.exports = {
           let musicToggle
           let ecoToggle
           let imgToggle
+          let logtoggle
           try{
           if(toggleMusic.toggle){
             musicToggle = ':white_check_mark: no changes made'
@@ -270,6 +289,24 @@ module.exports = {
           imgToggle = ':tools: fixed'
           iserror = true
         }
+
+        try {
+          if(logmsg.toggle){
+            logtoggle = ':white_check_mark: no changes made'
+          }
+        } catch  {
+            await LogMsg.findOneAndUpdate({
+                _id: guild.id
+                },{
+                _id: guild.id,
+                toggle: 'false',
+                    
+                },{
+                    upsert: true
+                })
+          logtoggle = ':tools: fixed'
+          iserror = true
+        }        
     
         try{
           if(toggleEco.toggle){
@@ -363,7 +400,8 @@ module.exports = {
             {name: "Guild Image Generation plugin", value: `${imgToggle}`},
             {name: "Guild Welcome Message", value: `${welcomeToggle}`},
             {name: "Guild Welcome Channel", value: `${welcomeChannel}`},
-            {name: "Guild Log Channel", value: `${logChannel}`}
+            {name: "Guild Log Channel", value: `${logChannel}`},
+            {name: "Guild Message Logging", value: `${logtoggle}`}
         )
         .setColor(embedcolour)
 

@@ -94,8 +94,8 @@ module.exports = {
         {name: "User's status", value: `${targetStatus}`},
         {name: `User joined ${guild.name}`, value: `${target.joinedAt}`},
         {name: "User's highest role", value: `${target.roles.highest}`},
-        {name: "Number of swear warnings:", value: `${offenseCount} warn(s) in 24 hours`},
-        {name: "Number of T.B.T.D.A's commands used", value: `${commandCount} command(s) executed in 24 hours`}
+        {name: "Number of swear warnings:", value: `${offenseCount} warn(s)`},
+        {name: "Number of T.B.T.D.A's commands used", value: `${commandCount} command(s)`}
     )
     .setColor('#DAF000')
     .setTimestamp()
