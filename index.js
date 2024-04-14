@@ -1168,13 +1168,19 @@ if (message.mentions.has(client.user.id)) {
         let song = args[0]
         if(!song) return message.reply('Please specify which song to remove.')
         if(isNaN(song)) return message.reply('Please enter the song number in the queue.')
-        guildQueue.remove(parseInt(song))
+        let trueQueuePosition
+        if(song > 1){
+            trueQueuePosition = song - 1
+        }
+        if(trueQueuePosition == null) trueQueuePosition = 1
+        //if(trueQueuePosition == 1) return message.reply(`Track ${trueQueuePosition} is currentaly playing. To stop playback use the !stop command.`)
+        guildQueue.remove(parseInt(trueQueuePosition))
         }catch(err){
             return message.channel.send(':x: Unable to comply, the queue is currentaly empty.')
         }
         const remove = new EmbedBuilder()
 			.setTitle('Song Removed:')
-			.setDescription(`Removed song \`${song}\` from the Queue! :outbox_tray:`)
+			.setDescription(`Removed song \`${args[0]}\` from the Queue! :outbox_tray:`)
 			.setColor('#6CFFD9');
 		message.channel.send({embeds: [remove]});
     }
