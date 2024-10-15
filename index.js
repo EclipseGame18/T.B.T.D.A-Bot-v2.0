@@ -458,7 +458,7 @@ let ttsQueue = []
 let ttsPlayerStatus = false
 let ttsMessageRequirement
 let musicOn = false
-let importantMessage = true
+let importantMessage = false
 
 setInterval(function(){ 
     //code goes here that will be run every 2 seconds.
