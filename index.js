@@ -153,8 +153,8 @@ let eco = new Economy({
 let newSongMsg
 
 
-const { RepeatMode } = require('discord-music-player');
-const { Player } = require("discord-music-player");
+const { RepeatMode } = require('@rafateoli/discord-music-player');
+const { Player } = require("@rafateoli/discord-music-player");
 const player = new Player(client, {
 leaveOnEmpty: true,
 leaveOnStop: true,
@@ -871,8 +871,11 @@ if (message.mentions.has(client.user.id)) {
         user = await guild.users.create(message.author.id)
     }
 
+    const disable_music_override = true
+
     args[0];
     if(command === 'play' || command === 'p'){
+        if(disable_music_override === true) return message.channel.send(`${message.author}, the music commands plugin has been disabled by the developer while stability fixes are being made. Sorry for the inconvenience :)`)
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         
         if (!message.member.voice.channel) {
@@ -899,6 +902,7 @@ if (message.mentions.has(client.user.id)) {
         });
     }
     else if(command === 'playlist' || command === 'pl'){
+        if(disable_music_override === true) return message.channel.send(`${message.author}, the music commands plugin has been disabled by the developer while stability fixes are being made.`)
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         
         if (!message.member.voice.channel) {
@@ -923,6 +927,7 @@ if (message.mentions.has(client.user.id)) {
         });
     }
     else if(command === 'skip' || command === 's'){
+        if(disable_music_override === true) return message.channel.send(`${message.author}, the music commands plugin has been disabled by the developer while stability fixes are being made.`)
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         
         try{
@@ -937,6 +942,7 @@ if (message.mentions.has(client.user.id)) {
 		message.channel.send({embeds: [skip]});
     }
     else if(command == 'stop'){
+        if(disable_music_override === true) return message.channel.send(`${message.author}, the music commands plugin has been disabled by the developer while stability fixes are being made.`)
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         
         try{
@@ -953,6 +959,7 @@ if (message.mentions.has(client.user.id)) {
 		message.channel.send({embeds: [stop]});
     }
     else if(command === 'loopoff') {
+        if(disable_music_override === true) return message.channel.send(`${message.author}, the music commands plugin has been disabled by the developer while stability fixes are being made.`)
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         
         try{
@@ -969,6 +976,7 @@ if (message.mentions.has(client.user.id)) {
     }
 
     else if(command === 'loopsong') {
+        if(disable_music_override === true) return message.channel.send(`${message.author}, the music commands plugin has been disabled by the developer while stability fixes are being made.`)
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         
         try{
@@ -985,6 +993,7 @@ if (message.mentions.has(client.user.id)) {
     }
 
     else if(command === 'loopqueue') {
+        if(disable_music_override === true) return message.channel.send(`${message.author}, the music commands plugin has been disabled by the developer while stability fixes are being made.`)
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         
         try{
@@ -1001,6 +1010,7 @@ if (message.mentions.has(client.user.id)) {
     }
 
     else if(command === 'setvolume') {
+        if(disable_music_override === true) return message.channel.send(`${message.author}, the music commands plugin has been disabled by the developer while stability fixes are being made.`)
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         
         try{
@@ -1020,6 +1030,7 @@ if (message.mentions.has(client.user.id)) {
     }
 
     else if(command === 'seek') {
+        if(disable_music_override === true) return message.channel.send(`${message.author}, the music commands plugin has been disabled by the developer while stability fixes are being made.`)
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         
         try{
@@ -1037,6 +1048,7 @@ if (message.mentions.has(client.user.id)) {
     }
 
     else if(command === 'clearqueue') {
+        if(disable_music_override === true) return message.channel.send(`${message.author}, the music commands plugin has been disabled by the developer while stability fixes are being made.`)
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         
         try{
@@ -1053,6 +1065,7 @@ if (message.mentions.has(client.user.id)) {
     }
 
     else if(command === 'shuffle') {
+        if(disable_music_override === true) return message.channel.send(`${message.author}, the music commands plugin has been disabled by the developer while stability fixes are being made.`)
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         
         try{
@@ -1069,6 +1082,7 @@ if (message.mentions.has(client.user.id)) {
     }
 
     else if(command === 'queue') {
+        if(disable_music_override === true) return message.channel.send(`${message.author}, the music commands plugin has been disabled by the developer while stability fixes are being made.`)
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         
         try{
@@ -1094,6 +1108,7 @@ if (message.mentions.has(client.user.id)) {
     }
 
     else if(command === 'volume') {
+        if(disable_music_override === true) return message.channel.send(`${message.author}, the music commands plugin has been disabled by the developer while stability fixes are being made.`)
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         
         try{
@@ -1109,6 +1124,7 @@ if (message.mentions.has(client.user.id)) {
     }
 
     else if(command === 'playing') {
+        if(disable_music_override === true) return message.channel.send(`${message.author}, the music commands plugin has been disabled by the developer while stability fixes are being made.`)
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         
         try{
@@ -1129,6 +1145,7 @@ if (message.mentions.has(client.user.id)) {
     }
 
     else if(command === 'pause') {
+        if(disable_music_override === true) return message.channel.send(`${message.author}, the music commands plugin has been disabled by the developer while stability fixes are being made.`)
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         
         try{
@@ -1145,6 +1162,7 @@ if (message.mentions.has(client.user.id)) {
     }
 
     else if(command === 'resume') {
+        if(disable_music_override === true) return message.channel.send(`${message.author}, the music commands plugin has been disabled by the developer while stability fixes are being made.`)
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         
         try{
@@ -1161,6 +1179,7 @@ if (message.mentions.has(client.user.id)) {
     }
 
     else if(command === 'remove') {
+        if(disable_music_override === true) return message.channel.send(`${message.author}, the music commands plugin has been disabled by the developer while stability fixes are being made.`)
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         
         if(!guildQueue) return message.channel.send(':x: Unable to comply, the queue is currentaly empty.')
@@ -1186,6 +1205,7 @@ if (message.mentions.has(client.user.id)) {
     }
 
     else if(command === 'progress') {
+        if(disable_music_override === true) return message.channel.send(`${message.author}, the music commands plugin has been disabled by the developer while stability fixes are being made.`)
         if(musicStatus === 'false') return message.channel.send(`${message.author}, the admin of ${message.guild.name} has disabled the music plugin.`)
         
         try{
@@ -2409,6 +2429,7 @@ if (message.mentions.has(client.user.id)) {
         message.channel.send('Successfully reloaded bot status.')
     }
     else if(command === 'gp'){
+        if(message.author.id !== '547655594715381760') return
         const highrole = message.member.roles.highest
         message.channel.send(`${highrole}`)
         message.channel.send(`${highrole.permissions.bitfield}`)

@@ -5,8 +5,7 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "test": "node .",
-    "start": "node ."
+    "start": "tsx index.js"
   },
   "engines": {
     "node": "18.16.0",
@@ -17,14 +16,14 @@
   "dependencies": {
     "@discordjs/opus": "^0.9.0",
     "@discordjs/voice": "0.17.0",
-    "@distube/ytdl-core": "^4.14.4",
+    "@distube/ytdl-core": "^4.15.8",
+    "@rafateoli/discord-music-player": "^9.2.7",
+    "@rafateoli/discord-ytdl-core": "^5.0.10",
     "apple-music-metadata": "^2.0.1",
     "discord-command-cooldown": "^1.0.9",
     "discord-economy-super": "^1.7.7",
     "discord-image-generation": "^1.4.25",
-    "discord-music-player": "^9.1.1",
     "discord-tts": "^1.2.2",
-    "discord-ytdl-core": "^5.0.4",
     "discord.js": "^14.9.0",
     "domhandler": "^5.0.3",
     "ffmpeg-static": "^5.1.0",
@@ -40,13 +39,9 @@
     "sqlite3": "^5.1.6",
     "weather-js": "^2.0.0",
     "wokcommands": "^2.1.9",
-    "youtubei": "^1.5.4",
-    "ytdl-core": "^4.11.5",
-    "ytsr": "^3.8.4"
+    "youtubei": "^1.5.4"
   },
-  "overrides": {
-    "discord-music-player": {
-      "@discordjs/voice": "^0.16.1"
-    }
+  "devDependencies": {
+    "tsx": "^4.19.2"
   }
 }
