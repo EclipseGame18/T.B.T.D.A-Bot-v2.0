@@ -172,7 +172,7 @@ client.player
 	let initMessage = queue.data.queueInitMessage;
 	const queueEmbed = new EmbedBuilder()
 			.setTitle('New song added:')
-			.setDescription(`[${song}](${song.url}) was added to the queue!`)
+			.setDescription(`[${song}](${song.url}) was added to the queue.`)
 			.setThumbnail(`${song.thumbnail}`)
 			.setColor('#6CFFD9');
 			await initMessage.channel.send({embeds: [queueEmbed]})
@@ -195,7 +195,7 @@ return;
     if(newSongMsg) newSongMsg.delete()
 	const embed = new EmbedBuilder()
 	.setTitle('New Song:')
-	.setDescription(`\`${oldSong}\` has finished, now playing: [${newSong}](${newSong.url})!`)
+	.setDescription(`\`${oldSong}\` has finished, now playing: [${newSong}](${newSong.url}).`)
 	.setThumbnail(`${newSong.thumbnail}`)
 	.setColor('#6CFFD9');
 	newSongMsg = await initMessage.channel.send({embeds: [embed]})  //.then(msg => {setTimeout(() => msg.delete(), 120000)}) (no longer needed, used to wait for 2.30 minuits before deleting message. Now message is deleted and then replaced with a new message)
@@ -871,7 +871,7 @@ if (message.mentions.has(client.user.id)) {
         user = await guild.users.create(message.author.id)
     }
 
-    const disable_music_override = true
+    const disable_music_override = false
 
     args[0];
     if(command === 'play' || command === 'p'){
