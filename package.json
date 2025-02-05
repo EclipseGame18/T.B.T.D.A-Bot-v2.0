@@ -1,6 +1,6 @@
 {
   "name": "t.b.t.d.a_bot",
-  "version": "2.2.4",
+  "version": "2.2.5",
   "description": "This is the re-write of T.B.T.D.A The Discord Bot",
   "main": "index.js",
   "private": true,

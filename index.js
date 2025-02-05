@@ -12,7 +12,7 @@ const {CommandCooldown, msToMinutes} = require('discord-command-cooldown');
 
 const sqlite3 = require('sqlite3').verbose();
 
-const version = 'v2.2.4'
+const version = 'v2.2.5'
 
 // Connect to the SQLite database
 const db = new sqlite3.Database('usr-data-temp.db');
