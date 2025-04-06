@@ -2,3 +2,5 @@ node_modules
 template_basic.js
 template_advanced.js
 alternet-index.js
+usr-data-temp.db
+ecosystem.config.js
