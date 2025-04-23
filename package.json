@@ -14,8 +14,8 @@
   "author": "Fergus, Eclipse Code18",
   "license": "MIT",
   "dependencies": {
-    "@discordjs/opus": "^0.9.0",
-    "@discordjs/voice": "0.17.0",
+    "@discordjs/opus": "^0.10.0",
+    "@discordjs/voice": "^0.18.0",
     "@distube/ytdl-core": "^4.16.8",
     "@rafateoli/discord-music-player": "^9.2.7",
     "@rafateoli/discord-ytdl-core": "^5.0.10",
@@ -39,7 +39,7 @@
     "sqlite3": "^5.1.6",
     "weather-js": "^2.0.0",
     "wokcommands": "^2.1.9",
-    "youtubei": "^1.5.4"
+    "youtubei": "^1.6.7"
   },
   "devDependencies": {
     "tsx": "^4.19.2"
