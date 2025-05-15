@@ -16,7 +16,7 @@
   "dependencies": {
     "@discordjs/opus": "^0.10.0",
     "@discordjs/voice": "^0.18.0",
-    "@distube/ytdl-core": "^4.16.8",
+    "@distube/ytdl-core": "^4.16.10",
     "@rafateoli/discord-music-player": "^9.2.7",
     "@rafateoli/discord-ytdl-core": "^5.0.10",
     "apple-music-metadata": "^2.0.1",
@@ -37,6 +37,7 @@
     "sequelize": "^6.32.1",
     "spotify-url-info": "^3.2.3",
     "sqlite3": "^5.1.6",
+    "undici": "^7.9.0",
     "weather-js": "^2.0.0",
     "wokcommands": "^2.1.9",
     "youtubei": "^1.6.7"
