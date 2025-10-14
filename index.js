@@ -2524,4 +2524,4 @@ async function infoMessage(message, author){
 
 }
 client.login(process.env.BOT_USER_TOKEN)
- //4.10.0
+ //npm install @distube/ytdl-core@latest

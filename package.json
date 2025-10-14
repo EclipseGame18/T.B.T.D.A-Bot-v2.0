@@ -16,7 +16,7 @@
   "dependencies": {
     "@discordjs/opus": "^0.10.0",
     "@discordjs/voice": "^0.18.0",
-    "@distube/ytdl-core": "^4.16.10",
+    "@distube/ytdl-core": "^4.16.12",
     "@rafateoli/discord-music-player": "^9.2.7",
     "@rafateoli/discord-ytdl-core": "^5.0.10",
     "apple-music-metadata": "^2.0.1",
@@ -40,7 +40,8 @@
     "undici": "^7.9.0",
     "weather-js": "^2.0.0",
     "wokcommands": "^2.1.9",
-    "youtubei": "^1.6.7"
+    "youtubei": "^1.6.7",
+    "ytsr": "^3.8.4"
   },
   "devDependencies": {
     "tsx": "^4.19.2"
