@@ -19,6 +19,7 @@
     "@distube/ytdl-core": "^4.16.12",
     "@rafateoli/discord-music-player": "^9.3.1",
     "@rafateoli/discord-ytdl-core": "^5.0.12",
+    "@snazzah/davey": "^0.1.9",
     "apple-music-metadata": "^2.0.1",
     "discord-command-cooldown": "^1.0.9",
     "discord-economy-super": "^1.7.7",
